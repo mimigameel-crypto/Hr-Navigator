@@ -1,0 +1,6 @@
+{
+  "name": "HR Navigator Consultations | Strategic Human Capital Advisory",
+  "description": "المنصة الرسمية لشركة HR Navigator Consultations المتخصصة في حلول الموارد البشرية والتطوير المؤسسي باللونين الأسود والذهبي، مع بوابات التسجيل والدفع ولوحة متابعة الطلبات.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
