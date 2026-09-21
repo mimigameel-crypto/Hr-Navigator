@@ -18,6 +18,47 @@ export interface User {
   role: 'customer' | 'admin';
   tier: 'Gold VIP' | 'Platinum Elite' | 'Royal Black';
   joinedDate: string;
+  isStudent?: boolean;
+  universityName?: string;
+  studentIdCard?: string; // base64 or photo URL
+}
+
+export interface CourseModuleDetail {
+  number?: number;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  topicsAr?: string[];
+  topicsEn?: string[];
+}
+
+export interface CourseDetailInfo {
+  sessionsCount: number;
+  trainingHours: number;
+  certificateTitleAr: string;
+  certificateTitleEn: string;
+  investmentEgp: number;
+  studentPriceEgp: number;
+  targetAudienceAr: string[];
+  targetAudienceEn: string[];
+  prerequisitesAr?: string;
+  prerequisitesEn?: string;
+  learningOutcomesAr: string[];
+  learningOutcomesEn: string[];
+  modules: CourseModuleDetail[];
+  studentDiscount: {
+    available: boolean;
+    studentPriceEgp: number;
+    standardPriceEgp: number;
+    discountNoteAr: string;
+    discountNoteEn: string;
+    idCardRequired: boolean;
+  };
+  deliveryFormatAr: string;
+  deliveryFormatEn: string;
+  toolsUsedAr?: string[];
+  toolsUsedEn?: string[];
 }
 
 export interface LuxuryService {
@@ -29,8 +70,10 @@ export interface LuxuryService {
   categoryEn: string;
   price: number;
   originalPrice?: number;
+  studentDiscountPrice?: number;
   exactPrices?: Partial<Record<Currency, number>>;
   exactOriginalPrices?: Partial<Record<Currency, number>>;
+  exactStudentPrices?: Partial<Record<Currency, number>>;
   image: string;
   descriptionAr: string;
   descriptionEn: string;
@@ -39,6 +82,7 @@ export interface LuxuryService {
   badgeAr?: string;
   badgeEn?: string;
   available: boolean;
+  courseDetails?: CourseDetailInfo;
 }
 
 export interface OrderItem {
@@ -46,7 +90,12 @@ export interface OrderItem {
   titleAr: string;
   titleEn: string;
   price: number;
+  originalPrice?: number;
+  studentDiscountPrice?: number;
   exactPrices?: Partial<Record<Currency, number>>;
+  exactOriginalPrices?: Partial<Record<Currency, number>>;
+  exactStudentPrices?: Partial<Record<Currency, number>>;
+  sku?: string;
   quantity: number;
 }
 
@@ -70,6 +119,9 @@ export interface Order {
   transactionRef?: string;
   consultationAppointment?: ConsultationAppointment;
   feedback?: ConsultationFeedback;
+  isStudentOrder?: boolean;
+  studentIdCardUrl?: string;
+  studentDiscountApplied?: number;
 }
 
 export interface ConsultationFeedback {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   X, 
   CreditCard, 
@@ -19,7 +19,10 @@ import {
   Landmark,
   Mail,
   Send,
-  Sparkles
+  Sparkles,
+  GraduationCap,
+  UploadCloud,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Language, Order, OrderItem, PaymentMethod, User, Currency } from '../types';
 import { translations } from '../translations';
@@ -92,6 +95,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [googlePayAccount] = useState('mimigameel@gmail.com');
   const [googlePaySelectedCard, setGooglePaySelectedCard] = useState('visa_4192');
 
+  // Student Discount Verification States
+  const [isStudentCheckout, setIsStudentCheckout] = useState<boolean>(currentUser?.isStudent || false);
+  const [studentUniversity, setStudentUniversity] = useState<string>(currentUser?.universityName || '');
+  const [studentIdCardUrl, setStudentIdCardUrl] = useState<string>(currentUser?.studentIdCard || '');
+  const [studentIdFileName, setStudentIdFileName] = useState<string>('');
+  const checkoutFileInputRef = useRef<HTMLInputElement>(null);
+
   const [processing, setProcessing] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [emailNotification, setEmailNotification] = useState<EmailNotificationPayload | null>(null);
@@ -99,15 +109,68 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Calculate unit price in active currency with exactPrices support
+  const handleStudentIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setStudentIdFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setStudentIdCardUrl(event.target?.result as string || '');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Check if cart contains HR for Juniors
+  const hasHRForJuniors = items.some(i => i.serviceId === 'srv-trn-jun-02' || i.sku === 'HRN-TRN-JUN');
+  const studentDiscountActive = isStudentCheckout && Boolean(studentIdCardUrl);
+
+  // Calculate unit price in active currency with exactPrices and student discount support
   const getItemUnitPrice = (item: OrderItem): number => {
+    const isJuniors = item.serviceId === 'srv-trn-jun-02' || item.sku === 'HRN-TRN-JUN';
+    if (isJuniors) {
+      if (studentDiscountActive) {
+        // Discounted Student Price: 3,000 EGP (or converted from 227 SAR)
+        if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
+          return item.exactPrices[currentCurrency]!;
+        }
+        return convertFromSAR(item.price, currentCurrency);
+      } else {
+        // Standard Non-Student Price: 4,500 EGP (or 340 SAR)
+        if (item.exactOriginalPrices && item.exactOriginalPrices[currentCurrency] !== undefined) {
+          return item.exactOriginalPrices[currentCurrency]!;
+        }
+        const origSar = item.originalPrice || 340;
+        return convertFromSAR(origSar, currentCurrency);
+      }
+    }
+
     if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
       return item.exactPrices[currentCurrency]!;
     }
     return convertFromSAR(item.price, currentCurrency);
   };
 
+  // Standard (non-discounted) price for reference
+  const getItemStandardUnitPrice = (item: OrderItem): number => {
+    const isJuniors = item.serviceId === 'srv-trn-jun-02' || item.sku === 'HRN-TRN-JUN';
+    if (isJuniors) {
+      if (item.exactOriginalPrices && item.exactOriginalPrices[currentCurrency] !== undefined) {
+        return item.exactOriginalPrices[currentCurrency]!;
+      }
+      const origSar = item.originalPrice || 340;
+      return convertFromSAR(origSar, currentCurrency);
+    }
+    if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
+      return item.exactPrices[currentCurrency]!;
+    }
+    return convertFromSAR(item.price, currentCurrency);
+  };
+
+  const standardTotal = items.reduce((sum, item) => sum + getItemStandardUnitPrice(item) * item.quantity, 0);
   const convertedTotal = items.reduce((sum, item) => sum + getItemUnitPrice(item) * item.quantity, 0);
+  const studentDiscountAmount = Math.max(0, standardTotal - convertedTotal);
+
   // Final price is all-inclusive (VAT included)
   const convertedTax = Math.round((convertedTotal * 0.15) / 1.15);
   const convertedSubtotal = convertedTotal;
@@ -159,7 +222,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         status: 'new',
         createdAt: new Date().toISOString(),
         notes: notes.trim(),
-        transactionRef: `TXN-${paymentMethod.toUpperCase()}-${Math.floor(10000000 + Math.random() * 90000000)}`
+        transactionRef: `TXN-${paymentMethod.toUpperCase()}-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        isStudentOrder: studentDiscountActive,
+        studentIdCardUrl: studentDiscountActive ? studentIdCardUrl : undefined,
+        studentDiscountApplied: studentDiscountActive ? studentDiscountAmount : undefined
       };
 
       setCompletedOrder(generatedOrder);
@@ -233,6 +299,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   }).format(completedOrder.total)} {isArabic ? (currencies[completedOrder.currency] || currencies.SAR).symbolAr : (currencies[completedOrder.currency] || currencies.SAR).symbolEn}
                 </span>
               </div>
+              {completedOrder.isStudentOrder && (
+                <div className="flex justify-between items-center text-emerald-400 font-medium pt-1 border-t border-emerald-500/20">
+                  <span className="flex items-center gap-1">
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    <span>{t.studentDiscountBadge}</span>
+                  </span>
+                  <span className="font-mono text-[11px] bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                    {isArabic ? 'معتمد بكارنيه الجامعة' : 'Verified by Student ID'}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between items-center text-[#9ea3b5] pt-2 border-t border-white/5">
                 <span>{t.dateCol}:</span>
                 <span className="text-white">{new Date().toLocaleString(isArabic ? 'ar-SA' : 'en-US')}</span>
@@ -377,6 +454,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
               {/* Totals */}
               <div className="mt-4 pt-3 border-t border-white/10 space-y-1 text-xs">
+                {studentDiscountActive && studentDiscountAmount > 0 && (
+                  <div className="flex justify-between text-[#9ea3b5]">
+                    <span>{isArabic ? 'السعر الأصلي قبل الخصم:' : 'Original Price:'}</span>
+                    <span className="font-mono text-[#8a8d9a] line-through">{formatAmount(standardTotal)}</span>
+                  </div>
+                )}
+                {studentDiscountActive && studentDiscountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-400 font-semibold">
+                    <span className="flex items-center gap-1.5">
+                      <GraduationCap className="w-4 h-4" />
+                      <span>{t.studentDiscountBadge}</span>
+                    </span>
+                    <span className="font-mono bg-emerald-500/15 px-2 py-0.5 rounded border border-emerald-500/30">
+                      -{formatAmount(studentDiscountAmount)}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between text-[#9ea3b5]">
                   <span>{t.subtotal}</span>
                   <span className="font-mono text-white">{formatAmount(convertedSubtotal)}</span>
@@ -393,6 +487,105 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               </div>
             </div>
+
+            {/* University Student Discount Activation Box (Especially if HR for Juniors is in cart or user is student) */}
+            {hasHRForJuniors && (
+              <div className="mb-6 p-4 rounded-2xl bg-gradient-to-br from-[#1c1d2e] via-[#151624] to-[#0e0f17] border border-[#d4af37]/40 shadow-lg space-y-3">
+                <div className="flex items-start gap-2.5">
+                  <input
+                    id="checkout-is-student-checkbox"
+                    type="checkbox"
+                    checked={isStudentCheckout}
+                    onChange={e => setIsStudentCheckout(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded accent-[#ffd700] bg-[#0c0d12] border-[#d4af37]/40 cursor-pointer"
+                  />
+                  <label htmlFor="checkout-is-student-checkbox" className="text-xs font-bold text-white cursor-pointer flex-1">
+                    <div className="flex items-center gap-1.5 text-[#ffd700]">
+                      <GraduationCap className="w-4 h-4" />
+                      <span>{t.isStudentCheckbox}</span>
+                    </div>
+                    <p className="text-[11px] text-[#9ea3b5] font-normal mt-0.5">
+                      {isArabic 
+                        ? 'تطبيق خصم كورس HR for Juniors (3,000 ج.م بدلاً من 4,500 ج.م) لطلبة الجامعات عند إرفاق صورة كارنيه الجامعة.'
+                        : 'Apply HR for Juniors Student Discount (3,000 EGP instead of 4,500 EGP) by uploading your university student ID.'}
+                    </p>
+                  </label>
+                </div>
+
+                {isStudentCheckout && (
+                  <div className="pt-3 border-t border-white/10 space-y-3">
+                    <div>
+                      <label className="block text-[11px] font-medium text-[#c5c8d6] mb-1">
+                        {t.universityNameLabel}
+                      </label>
+                      <input
+                        type="text"
+                        value={studentUniversity}
+                        onChange={e => setStudentUniversity(e.target.value)}
+                        placeholder={t.universityNamePlaceholder}
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#0d0e17] border border-[#d4af37]/30 text-xs text-white placeholder-[#5a5e70] focus:outline-none focus:border-[#ffd700]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-[#c5c8d6] mb-1 flex items-center justify-between">
+                        <span>{t.studentIdUploadLabel} <span className="text-amber-400">*</span></span>
+                        <span className="text-[10px] text-[#8a8d9a] font-mono">JPG, PNG, PDF</span>
+                      </label>
+
+                      <input
+                        type="file"
+                        ref={checkoutFileInputRef}
+                        onChange={handleStudentIdUpload}
+                        accept="image/*,.pdf"
+                        className="hidden"
+                        id="checkout-student-id-upload"
+                      />
+
+                      {studentIdCardUrl ? (
+                        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 overflow-hidden">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                            <div className="truncate">
+                              <p className="text-xs font-bold text-emerald-300 truncate">
+                                {studentIdFileName || (isArabic ? 'صورة كارنيه الجامعة (مرفق)' : 'Student ID Card (Attached)')}
+                              </p>
+                              <span className="text-[10px] text-emerald-400/80">
+                                {t.studentDiscountAppliedTag}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setStudentIdCardUrl('');
+                              setStudentIdFileName('');
+                            }}
+                            className="text-[11px] text-rose-400 hover:text-rose-300 font-medium cursor-pointer p-1"
+                          >
+                            {isArabic ? 'تغيير' : 'Change'}
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => checkoutFileInputRef.current?.click()}
+                          className="w-full p-3.5 rounded-xl border border-dashed border-[#d4af37]/50 hover:border-[#ffd700] bg-[#0c0d15] hover:bg-[#161726] text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group"
+                        >
+                          <UploadCloud className="w-5 h-5 text-[#ffd700] group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-bold text-white">
+                            {isArabic ? 'اضغط لرفع صورة كارنيه الجامعة وتفعيل الخصم' : 'Upload University Student ID photo to apply discount'}
+                          </span>
+                          <span className="text-[10px] text-[#8a8d9a]">
+                            {t.studentIdUploadHint}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Client Details */}
             <div className="space-y-3 mb-6">

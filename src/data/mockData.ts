@@ -211,8 +211,8 @@ export const initialServices: LuxuryService[] = [
       'Organizational Culture & HR Policies',
       'Official Certificate of Completion'
     ],
-    badgeAr: 'خصم خاص • 7,000 ج.م',
-    badgeEn: 'Special Offer • 7,000 EGP',
+    badgeAr: 'برنامج تدريبي متقدم',
+    badgeEn: 'Advanced Program',
     available: true
   },
   {
@@ -222,17 +222,17 @@ export const initialServices: LuxuryService[] = [
     titleEn: 'HR for Juniors Program',
     categoryAr: 'البرامج التدريبية والكورسات',
     categoryEn: 'Training Programs',
-    price: 265,
+    price: 227,
     originalPrice: 340,
     exactPrices: {
-      EGP: 3500,
-      SAR: 265,
-      USD: 73,
-      AED: 260,
-      QAR: 257,
-      KWD: 22,
-      BHD: 27,
-      OMR: 28
+      EGP: 3000,
+      SAR: 227,
+      USD: 62,
+      AED: 223,
+      QAR: 220,
+      KWD: 19,
+      BHD: 23,
+      OMR: 24
     },
     exactOriginalPrices: {
       EGP: 4500,
@@ -240,8 +240,8 @@ export const initialServices: LuxuryService[] = [
       USD: 95
     },
     image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=900&q=80',
-    descriptionAr: 'مقدمة عملية لوظائف الموارد البشرية الأساسية، مصممة خصيصاً للمبتدئين والمهنيين الجدد في مجال الموارد البشرية (6 جلسات • 12 ساعة تدريبية • شهادة إتمام).',
-    descriptionEn: 'A practical introduction to the core HR functions, designed specifically for HR beginners and junior professionals (6 Sessions • 12 Training Hours • Certificate of Completion).',
+    descriptionAr: 'مقدمة عملية لوظائف الموارد البشرية الأساسية، مصممة خصيصاً للمبتدئين والمهنيين الجدد في مجال الموارد البشرية (6 جلسات • 12 ساعة تدريبية • شهادة إتمام). خصم خاص لطلبة الجامعة بـ 3,000 ج.م بدلاً من 4,500 ج.م عند إرفاق صورة كارنيه الجامعة.',
+    descriptionEn: 'A practical introduction to the core HR functions, designed specifically for HR beginners and junior professionals (6 Sessions • 12 Training Hours • Certificate of Completion). Special university student discount: 3,000 EGP (originally 4,500 EGP) with valid University Student ID.',
     featuresAr: [
       '6 جلسات تطبيقية • 12 ساعة تدريبية',
       'Recruitment & Talent Acquisition — Fundamentals',
@@ -260,8 +260,8 @@ export const initialServices: LuxuryService[] = [
       'Organizational Culture & HR Policies — Fundamentals',
       'Official Certificate of Completion'
     ],
-    badgeAr: 'خصم خاص • 3,500 ج.م',
-    badgeEn: 'Special Offer • 3,500 EGP',
+    badgeAr: 'خصم خاص لطلبة الجامعة • 3,000 ج.م',
+    badgeEn: 'University Student Discount • 3,000 EGP',
     available: true
   },
   {
@@ -310,8 +310,8 @@ export const initialServices: LuxuryService[] = [
       '6. People Analytics & Strategic HR Transformation',
       'Official Certificate of Completion'
     ],
-    badgeAr: 'خصم خاص • 3,750 ج.م',
-    badgeEn: 'Special Offer • 3,750 EGP',
+    badgeAr: 'كورس معتمد بالذكاء الاصطناعي',
+    badgeEn: 'AI Certified Course',
     available: true
   },
   {
@@ -357,8 +357,8 @@ export const initialServices: LuxuryService[] = [
       'Measuring OD Impact & Long-term Effectiveness',
       'Official Certificate of Completion'
     ],
-    badgeAr: 'خصم خاص • 5,000 ج.م',
-    badgeEn: 'Special Offer • 5,000 EGP',
+    badgeAr: 'برنامج تدريبي معتمد',
+    badgeEn: 'Certified Program',
     available: true
   }
 ];

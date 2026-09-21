@@ -437,7 +437,6 @@ export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = (
               >
                 <Linkedin className="w-4 h-4" />
                 <span>{isArabic ? 'متابعة على LinkedIn' : 'Follow on LinkedIn'}</span>
-                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">+1.5K</span>
               </a>
 
               {/* Instagram Follow Button */}
@@ -450,7 +449,6 @@ export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = (
               >
                 <Instagram className="w-4 h-4" />
                 <span>{isArabic ? 'متابعة على Instagram' : 'Follow on Instagram'}</span>
-                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">+3.8K</span>
               </a>
 
               {/* YouTube Channel Button */}
@@ -463,7 +461,6 @@ export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = (
               >
                 <Youtube className="w-4 h-4" />
                 <span>{isArabic ? 'قناة YouTube الرسمية' : 'YouTube Channel'}</span>
-                <span className="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">+1.2K</span>
               </a>
 
               {/* WhatsApp Community / Direct Broadcast Button */}

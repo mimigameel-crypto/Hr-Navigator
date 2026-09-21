@@ -29,7 +29,8 @@ import {
   X,
   Download,
   Info,
-  BookOpen
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 import { Language, Order, OrderStatus, DigitalResource, SocialPost } from '../types';
 import { translations } from '../translations';
@@ -546,6 +547,25 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <div className="text-[11px] text-[#8a8d9a] font-mono">
                           {order.customerPhone}
                         </div>
+                        {order.isStudentOrder && (
+                          <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-1.5 py-0.5 rounded">
+                              <GraduationCap className="w-3 h-3" />
+                              <span>{isArabic ? 'طالب جامعي' : 'Student'}</span>
+                            </span>
+                            {order.studentIdCardUrl && (
+                              <a
+                                href={order.studentIdCardUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[10px] text-[#ffd700] hover:underline"
+                              >
+                                <ExternalLink className="w-2.5 h-2.5" />
+                                <span>{isArabic ? 'عرض الكارنيه' : 'View ID'}</span>
+                              </a>
+                            )}
+                          </div>
+                        )}
                       </td>
 
                       {/* Service / Item */}

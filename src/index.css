@@ -27,6 +27,78 @@
   border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
+/* Logo Shimmer & Flash Gleam Effect on Hover */
+@keyframes logoGleamSweep {
+  0% {
+    transform: translateX(-160%) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(260%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes logoGoldFlash {
+  0% {
+    filter: drop-shadow(0 2px 14px rgba(212, 175, 55, 0.45));
+  }
+  50% {
+    filter: drop-shadow(0 0 26px rgba(255, 230, 130, 0.95)) drop-shadow(0 0 50px rgba(212, 175, 55, 0.85));
+  }
+  100% {
+    filter: drop-shadow(0 2px 18px rgba(212, 175, 55, 0.6));
+  }
+}
+
+@keyframes textGoldFlash {
+  0% {
+    filter: brightness(1) drop-shadow(0 2px 10px rgba(212, 175, 55, 0.3));
+    text-shadow: 0 0 4px rgba(212, 175, 55, 0.2);
+  }
+  50% {
+    filter: brightness(1.35) drop-shadow(0 0 24px rgba(255, 235, 150, 0.95)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.8));
+    text-shadow: 0 0 16px rgba(255, 235, 140, 0.95), 0 0 30px rgba(212, 175, 55, 0.75);
+  }
+  100% {
+    filter: brightness(1.15) drop-shadow(0 2px 14px rgba(212, 175, 55, 0.5));
+    text-shadow: 0 0 8px rgba(212, 175, 55, 0.35);
+  }
+}
+
+@keyframes textGleamSweep {
+  0% {
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(260%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+.logo-shimmer-container:hover .logo-gleam-line {
+  animation: logoGleamSweep 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.logo-shimmer-container:hover .logo-svg-emblem {
+  animation: logoGoldFlash 1.4s ease-in-out infinite alternate;
+}
+
+.logo-shimmer-container:hover .logo-text-title {
+  animation: textGoldFlash 1.4s ease-in-out infinite alternate;
+}
+
+.logo-shimmer-container:hover .logo-text-gleam {
+  animation: textGleamSweep 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
 /* Custom Scrollbar for modern sleek dark aesthetics */
 ::-webkit-scrollbar {
   width: 8px;

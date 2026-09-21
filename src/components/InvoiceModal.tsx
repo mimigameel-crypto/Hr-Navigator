@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Printer, CheckCircle, Shield, QrCode } from 'lucide-react';
+import { X, Printer, CheckCircle, Shield, QrCode, GraduationCap } from 'lucide-react';
 import { Language, Order } from '../types';
 import { translations } from '../translations';
 import { BrandLogo } from './BrandLogo';
@@ -219,6 +219,17 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
             {/* Subtotal / Tax / Grand Total */}
             <div className="w-64 space-y-2 text-xs">
+              {order.isStudentOrder && order.studentDiscountApplied && (
+                <div className="flex justify-between text-emerald-400 font-semibold print:text-green-700">
+                  <span className="flex items-center gap-1">
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    <span>{isArabic ? 'خصم طلبة الجامعة' : 'Student Discount'}</span>
+                  </span>
+                  <span className="font-mono">
+                    -{formatCurrency(order.studentDiscountApplied)} {currencySymbol}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-[#8a8d9a] print:text-gray-600">
                 <span>{t.subtotal}</span>
                 <span className="font-mono text-white print:text-black">

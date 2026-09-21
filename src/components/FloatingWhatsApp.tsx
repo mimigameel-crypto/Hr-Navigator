@@ -145,7 +145,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
   return (
     <div 
       id="floating-whatsapp-container"
-      className={`fixed bottom-6 ${isArabic ? 'left-6' : 'right-6'} z-50 flex flex-col ${isArabic ? 'items-start' : 'items-end'}`}
+      className={`fixed bottom-6 ${isArabic ? 'left-6' : 'right-6'} z-40 flex flex-col ${isArabic ? 'items-start' : 'items-end'}`}
     >
       {/* Quick Interactive Chat Popup Card */}
       {isOpen && (
@@ -301,16 +301,18 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
 
       {/* Floating Toggle Button */}
       <div className="flex items-center gap-2">
-        {/* Floating Tooltip Pill (Desktop) */}
+        {/* Floating Tooltip Pill (Desktop) - Compact & Sleek */}
         {!isOpen && (
           <button
+            id="btn-floating-whatsapp-pill"
             type="button"
             onClick={() => setIsOpen(true)}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#141624]/90 border border-[#25D366]/40 text-white text-xs font-semibold shadow-lg backdrop-blur-md hover:border-[#25D366] transition-all cursor-pointer group"
+            className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#12141f]/95 border border-[#25D366]/40 text-emerald-300 text-[11px] font-medium shadow-md backdrop-blur-md hover:border-[#25D366] hover:text-white transition-all cursor-pointer group whitespace-nowrap"
+            title={isArabic ? 'تواصل معنا مباشرة عبر واتساب' : 'Chat with us on WhatsApp'}
           >
-            <span className="w-2 h-2 rounded-full bg-[#25D366] animate-pulse" />
-            <span className="group-hover:text-[#25D366] transition-colors">
-              {isArabic ? 'تواصل معنا مباشرة عبر واتساب' : 'Chat with us on WhatsApp'}
+            <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse" />
+            <span className="group-hover:text-[#25D366] transition-colors text-[10.5px]">
+              {isArabic ? 'واتساب' : 'WhatsApp'}
             </span>
           </button>
         )}
@@ -319,18 +321,18 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
           id="btn-floating-whatsapp"
           type="button"
           onClick={() => setIsOpen(prev => !prev)}
-          className="relative w-14 h-14 rounded-full bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:from-[#159a8b] hover:to-[#2ee06f] text-white shadow-[0_8px_30px_rgba(37,211,102,0.45)] flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer border-2 border-white/20"
+          className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:from-[#159a8b] hover:to-[#2ee06f] text-white shadow-[0_6px_25px_rgba(37,211,102,0.4)] flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border-2 border-white/20"
           aria-label={isArabic ? 'خدمة العملاء عبر واتساب' : 'WhatsApp Customer Service'}
         >
           {isOpen ? (
-            <X className="w-6 h-6 text-white" />
+            <X className="w-5 h-5 text-white" />
           ) : (
             <>
-              <MessageCircle className="w-7 h-7 fill-white text-white" />
+              <MessageCircle className="w-6 h-6 fill-white text-white" />
               {/* Online Pulse Indicator */}
-              <span className="absolute top-0 right-0 flex h-3.5 w-3.5">
+              <span className="absolute top-0 right-0 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-[#12141e]" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-[#12141e]" />
               </span>
             </>
           )}

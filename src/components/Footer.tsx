@@ -54,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   return (
-    <footer id="main-footer" className="bg-[#090a0e] border-t border-[#d4af37]/25 text-[#9ea3b5] pt-16 pb-10">
+    <footer id="main-footer" className="bg-[#090a0e] border-t border-[#d4af37]/25 text-[#9ea3b5] pt-16 pb-16 sm:pb-14">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/5">
@@ -272,8 +272,30 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
 
+        {/* Dedicated Back to Top Section at the End of the Website */}
+        <div className="pt-10 pb-4 flex flex-col items-center justify-center border-t border-white/5">
+          <button
+            id="btn-footer-back-to-top"
+            type="button"
+            onClick={scrollToTop}
+            className="group relative inline-flex items-center gap-3 px-8 py-3.5 rounded-full bg-gradient-to-r from-[#171924] via-[#222739] to-[#171924] border-2 border-[#d4af37]/50 hover:border-[#ffd700] text-white hover:text-[#ffd700] shadow-[0_4px_25px_rgba(212,175,55,0.2)] hover:shadow-[0_8px_35px_rgba(212,175,55,0.4)] transition-all duration-300 transform hover:-translate-y-1 active:translate-y-0 cursor-pointer"
+            title={isArabic ? 'العودة لأعلى الموقع' : 'Back to Top'}
+            aria-label={isArabic ? 'العودة إلى أعلى الموقع' : 'Return to top of page'}
+          >
+            <div className="w-8 h-8 rounded-full bg-[#d4af37] text-black flex items-center justify-center font-bold shadow-md group-hover:scale-110 transition-transform">
+              <ArrowUp className="w-5 h-5 text-black stroke-[2.5]" />
+            </div>
+            <span className="text-base font-extrabold tracking-wide text-[#ffd700] group-hover:text-white transition-colors">
+              {isArabic ? 'أعلى' : 'Top'}
+            </span>
+            <span className="text-xs text-[#8a8d9a] font-normal border-s border-white/15 ps-3 hidden sm:inline">
+              {isArabic ? 'الرجوع لبداية الصفحة' : 'Scroll back to the top'}
+            </span>
+          </button>
+        </div>
+
         {/* Bottom Rights Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
           <div>{t.rightsReserved}</div>
 
           {/* Payment Gateways Bar */}
@@ -296,13 +318,14 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
 
           <button
+            id="btn-footer-bottom-bar-top"
             type="button"
             onClick={scrollToTop}
-            className="p-2 rounded-xl bg-[#14151e] border border-[#d4af37]/30 text-[#ffd700] hover:bg-[#1d1f2b] transition-colors flex items-center gap-1.5"
-            title="Scroll to top"
+            className="px-3 py-1.5 rounded-xl bg-[#14151e] border border-[#d4af37]/30 text-[#ffd700] hover:bg-[#1d1f2b] transition-colors flex items-center gap-2 font-medium"
+            title={isArabic ? 'العودة لأعلى الموقع' : 'Scroll to top'}
           >
-            <span>{isArabic ? 'للأعلى' : 'Top'}</span>
-            <ArrowUp className="w-3.5 h-3.5" />
+            <ArrowUp className="w-4 h-4 text-[#ffd700]" />
+            <span>{isArabic ? 'أعلى' : 'Top'}</span>
           </button>
         </div>
       </div>

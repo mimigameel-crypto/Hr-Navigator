@@ -19,6 +19,7 @@ import { ManualOrderModal } from './components/ManualOrderModal';
 import { CartDrawer } from './components/CartDrawer';
 import { Footer } from './components/Footer';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { ScrollToTopButton } from './components/ScrollToTopButton';
 import { ClientPortal } from './components/ClientPortal';
 import { AdminSecurityModal } from './components/AdminSecurityModal';
 import { HRHealthCheckSection } from './components/HRHealthCheckSection';
@@ -227,7 +228,10 @@ export default function App() {
           titleAr: service.titleAr,
           titleEn: service.titleEn,
           price: service.price,
+          originalPrice: service.originalPrice,
           exactPrices: service.exactPrices,
+          exactOriginalPrices: service.exactOriginalPrices,
+          sku: service.sku,
           quantity: 1
         }
       ];
@@ -260,7 +264,10 @@ export default function App() {
       titleAr: service.titleAr,
       titleEn: service.titleEn,
       price: service.price,
+      originalPrice: service.originalPrice,
       exactPrices: service.exactPrices,
+      exactOriginalPrices: service.exactOriginalPrices,
+      sku: service.sku,
       quantity: 1
     };
     setCheckoutItems([singleItem]);
@@ -550,8 +557,11 @@ export default function App() {
         onClose={() => setShareModalOpen(false)}
       />
 
-      {/* Floating WhatsApp Contact Button for Instant Customer Service */}
-      <FloatingWhatsApp lang={lang} />
+      {/* Floating WhatsApp Contact Button for Instant Customer Service (hidden during checkout) */}
+      {!checkoutModalOpen && <FloatingWhatsApp lang={lang} />}
+
+      {/* Floating Back to Top Button (hidden during checkout) */}
+      {!checkoutModalOpen && <ScrollToTopButton lang={lang} />}
     </div>
   );
 }

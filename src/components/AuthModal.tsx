@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   X, 
   User as UserIcon, 
@@ -9,7 +9,12 @@ import {
   ShieldCheck, 
   ArrowRight,
   ArrowLeft,
-  Sparkles
+  Sparkles,
+  GraduationCap,
+  UploadCloud,
+  CheckCircle2,
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 import { Language, User } from '../types';
 import { translations } from '../translations';
@@ -37,14 +42,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [tier, setTier] = useState<'Gold VIP' | 'Platinum Elite' | 'Royal Black'>('Gold VIP');
+  const [isStudent, setIsStudent] = useState(false);
+  const [universityName, setUniversityName] = useState('');
+  const [studentIdFileName, setStudentIdFileName] = useState('');
+  const [studentIdDataUrl, setStudentIdDataUrl] = useState('');
   const [agreed, setAgreed] = useState(true);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
   const t = translations[lang];
   const isArabic = lang === 'ar';
   const ArrowIcon = isArabic ? ArrowLeft : ArrowRight;
+
+  const handleStudentIdUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setStudentIdFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setStudentIdDataUrl(event.target?.result as string || '');
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +75,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     if (mode === 'register') {
       if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
         setError(isArabic ? 'يرجى إكمال جميع الحقول المطلوبة' : 'Please fill all required fields');
+        return;
+      }
+      if (isStudent && !studentIdDataUrl) {
+        setError(isArabic ? 'يرجى رفع صورة كارنيه الجامعة لتفعيل خصم الطلبة' : 'Please upload your University Student ID photo to activate the discount');
         return;
       }
       if (!agreed) {
@@ -67,7 +93,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         phone: phone.trim(),
         role: 'customer',
         tier: tier,
-        joinedDate: new Date().toISOString().split('T')[0]
+        joinedDate: new Date().toISOString().split('T')[0],
+        isStudent: isStudent,
+        universityName: universityName.trim() || undefined,
+        studentIdCard: studentIdDataUrl || undefined
       };
 
       onSuccess(newUser);
@@ -245,6 +274,101 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* University Student Discount Verification Section */}
+                <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#1b1c2b] to-[#12131f] border border-[#d4af37]/35 shadow-inner space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <input
+                      id="is-student-checkbox"
+                      type="checkbox"
+                      checked={isStudent}
+                      onChange={e => setIsStudent(e.target.checked)}
+                      className="w-4 h-4 mt-0.5 rounded accent-[#ffd700] bg-[#0c0d12] border-[#d4af37]/40 cursor-pointer"
+                    />
+                    <label htmlFor="is-student-checkbox" className="text-xs font-bold text-white cursor-pointer flex-1">
+                      <div className="flex items-center gap-1.5 text-[#ffd700]">
+                        <GraduationCap className="w-4 h-4" />
+                        <span>{t.isStudentCheckbox}</span>
+                      </div>
+                      <p className="text-[11px] text-[#9ea3b5] font-normal mt-0.5">
+                        {isArabic ? 'خصم حصري على كورس HR for Juniors (3,000 ج.م بدلاً من 4,500 ج.م) لجميع طلبة الجامعات' : 'Special offer on HR for Juniors (3,000 EGP instead of 4,500 EGP) for university students'}
+                      </p>
+                    </label>
+                  </div>
+
+                  {isStudent && (
+                    <div className="pt-2.5 border-t border-white/10 space-y-3">
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#c5c8d6] mb-1">
+                          {t.universityNameLabel}
+                        </label>
+                        <input
+                          type="text"
+                          value={universityName}
+                          onChange={e => setUniversityName(e.target.value)}
+                          placeholder={t.universityNamePlaceholder}
+                          className="w-full px-3 py-2 rounded-xl bg-[#0e0f17] border border-[#d4af37]/30 text-xs text-white placeholder-[#5a5e70] focus:outline-none focus:border-[#ffd700]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium text-[#c5c8d6] mb-1 flex items-center justify-between">
+                          <span>{t.studentIdUploadLabel} <span className="text-amber-400">*</span></span>
+                          <span className="text-[10px] text-[#8a8d9a] font-mono">JPG, PNG, PDF</span>
+                        </label>
+
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={handleStudentIdUpload}
+                          accept="image/*,.pdf"
+                          className="hidden"
+                          id="auth-student-id-upload"
+                        />
+
+                        {studentIdDataUrl ? (
+                          <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                              <div className="truncate">
+                                <p className="text-xs font-bold text-emerald-300 truncate">
+                                  {studentIdFileName || (isArabic ? 'صورة كارنيه الجامعة' : 'Student ID Card')}
+                                </p>
+                                <span className="text-[10px] text-emerald-400/80">
+                                  {t.studentIdUploadSuccess}
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setStudentIdDataUrl('');
+                                setStudentIdFileName('');
+                              }}
+                              className="text-[11px] text-rose-400 hover:text-rose-300 font-medium cursor-pointer p-1"
+                            >
+                              {isArabic ? 'تغيير' : 'Change'}
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full p-3 rounded-xl border border-dashed border-[#d4af37]/50 hover:border-[#ffd700] bg-[#0c0d15] hover:bg-[#151624] text-center transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group"
+                          >
+                            <UploadCloud className="w-5 h-5 text-[#ffd700] group-hover:scale-110 transition-transform" />
+                            <span className="text-xs font-bold text-white">
+                              {isArabic ? 'اضغط لرفع صورة كارنيه الجامعة' : 'Click to upload Student ID photo'}
+                            </span>
+                            <span className="text-[10px] text-[#8a8d9a]">
+                              {t.studentIdUploadHint}
+                            </span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             )}

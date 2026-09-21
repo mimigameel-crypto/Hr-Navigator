@@ -8,7 +8,8 @@ import {
   Filter,
   Coins,
   Search,
-  X
+  X,
+  GraduationCap
 } from 'lucide-react';
 import { Language, LuxuryService, Currency } from '../types';
 import { translations } from '../translations';
@@ -230,8 +231,13 @@ export const CatalogSection: React.FC<CatalogSectionProps> = ({
 
                   {/* Badge */}
                   {badge && (
-                    <div className="absolute top-4 right-4 rtl:right-auto rtl:left-4 z-10 px-3 py-1 rounded-full bg-[#0c0d12]/90 border border-[#d4af37]/50 text-[11px] font-bold text-[#ffd700] backdrop-blur-md shadow-sm">
-                      {badge}
+                    <div className={`absolute top-4 right-4 rtl:right-auto rtl:left-4 z-10 px-3 py-1 rounded-full text-[11px] font-bold backdrop-blur-md shadow-sm flex items-center gap-1.5 ${
+                      service.id === 'srv-trn-jun-02'
+                        ? 'bg-gradient-to-r from-emerald-950/90 to-[#0c0d12]/95 border border-emerald-400/60 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.25)]'
+                        : 'bg-[#0c0d12]/90 border border-[#d4af37]/50 text-[#ffd700]'
+                    }`}>
+                      {service.id === 'srv-trn-jun-02' && <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />}
+                      <span>{badge}</span>
                     </div>
                   )}
 
