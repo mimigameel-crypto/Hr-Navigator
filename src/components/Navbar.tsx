@@ -39,6 +39,7 @@ interface NavbarProps {
   isAdminAuthenticated: boolean;
   onOpenShare: () => void;
   onNavigateResources?: () => void;
+  onOpenMagazineModal?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -57,7 +58,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onRequestAdminAccess,
   isAdminAuthenticated,
   onOpenShare,
-  onNavigateResources
+  onNavigateResources,
+  onOpenMagazineModal
 }) => {
   const t = translations[lang];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -93,11 +95,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>{t.clientStore}</span>
           </button>
 
-          {/* 2. Executive Magazine Full Page View */}
+          {/* 2. Executive Magazine Modal Trigger */}
           <button
             id="nav-btn-magazine"
             type="button"
-            onClick={() => onToggleView('magazine')}
+            onClick={() => {
+              if (onOpenMagazineModal) {
+                onOpenMagazineModal();
+              } else {
+                onToggleView('magazine');
+              }
+            }}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeView === 'magazine'
                 ? 'bg-gradient-to-r from-[#d4af37]/25 to-[#c59b27]/25 text-[#ffd700] border border-[#d4af37]/50 shadow-sm'
@@ -328,8 +336,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => {
-                onToggleView('magazine');
                 setMobileMenuOpen(false);
+                if (onOpenMagazineModal) {
+                  onOpenMagazineModal();
+                } else {
+                  onToggleView('magazine');
+                }
               }}
               className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold border transition-colors ${
                 activeView === 'magazine'

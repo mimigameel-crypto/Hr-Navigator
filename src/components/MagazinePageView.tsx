@@ -161,6 +161,18 @@ export const MagazinePageView: React.FC<MagazinePageViewProps> = ({
             </button>
 
             <a
+              href="https://aistudio.google.com/u/1/apps/500e0d19-e33d-4ab8-94e8-d4e93f4c3a2e?showPreview=true&showAssistant=true&fullscreenApplet=true"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#4285F4]/20 to-[#2563EB]/20 border border-[#4285F4]/50 hover:border-[#4285F4] text-[#60a5fa] text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              title={isArabic ? 'فتح تطبيق المجلة التفاعلي في نافذة كاملة' : 'Open Fullscreen Applet'}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#4285F4]" />
+              <span className="hidden sm:inline">{isArabic ? 'التطبيق التفاعلي السحابي' : 'Interactive Applet'}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+
+            <a
               href={activeIssue.pdfUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -285,6 +297,17 @@ export const MagazinePageView: React.FC<MagazinePageViewProps> = ({
 
               {/* Call to Actions */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                <a
+                  href="https://aistudio.google.com/u/1/apps/500e0d19-e33d-4ab8-94e8-d4e93f4c3a2e?showPreview=true&showAssistant=true&fullscreenApplet=true"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#4285F4] to-[#2563EB] text-white font-extrabold text-xs sm:text-sm shadow-[0_4px_25px_rgba(66,133,244,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>{isArabic ? 'فتح تطبيق المجلة السحابي التفاعلي' : 'Open Live Interactive Applet'}</span>
+                  <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+                </a>
+
                 <a
                   href={activeIssue.pdfUrl}
                   target="_blank"

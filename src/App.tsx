@@ -28,6 +28,7 @@ import { ShareModal } from './components/ShareModal';
 import { DigitalResourcesSection } from './components/DigitalResourcesSection';
 import { GoogleDriveModal } from './components/GoogleDriveModal';
 import { MagazinePageView } from './components/MagazinePageView';
+import { MagazineModal } from './components/MagazineModal';
 import { DigitalResource, SocialPost } from './types';
 import { initialDigitalResources, initialSocialPosts } from './data/resourcesData';
 import { CloudService } from './lib/cloudService';
@@ -189,6 +190,7 @@ export default function App() {
   const [manualOrderModalOpen, setManualOrderModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [googleDriveModalOpen, setGoogleDriveModalOpen] = useState(false);
+  const [magazineModalOpen, setMagazineModalOpen] = useState(false);
 
   // Sync HTML tag direction & lang
   useEffect(() => {
@@ -423,6 +425,7 @@ export default function App() {
         isAdminAuthenticated={isAdminUnlocked || currentUser?.role === 'admin'}
         onOpenShare={() => setShareModalOpen(true)}
         onNavigateResources={scrollToResources}
+        onOpenMagazineModal={() => setMagazineModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -439,10 +442,7 @@ export default function App() {
               }}
               onQuickPay={handleQuickCheckout}
               onShare={() => setShareModalOpen(true)}
-              onOpenMagazine={() => {
-                setActiveView('magazine');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onOpenMagazine={() => setMagazineModalOpen(true)}
             />
 
             {/* 6 Specialization Pillars Strip */}
@@ -474,10 +474,7 @@ export default function App() {
               onBuyResource={handleBuyResource}
               resources={digitalResources}
               socialPosts={socialPosts}
-              onOpenMagazinePage={() => {
-                setActiveView('magazine');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onOpenMagazinePage={() => setMagazineModalOpen(true)}
             />
           </>
         ) : activeView === 'magazine' ? (
@@ -556,10 +553,7 @@ export default function App() {
           setAuthModalOpen(true);
         }}
         onRequestAdminAccess={() => setAdminSecurityModalOpen(true)}
-        onOpenMagazine={() => {
-          setActiveView('magazine');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenMagazine={() => setMagazineModalOpen(true)}
       />
 
       {/* Owner Security PIN Modal */}
@@ -647,6 +641,21 @@ export default function App() {
         isOpen={googleDriveModalOpen}
         onClose={() => setGoogleDriveModalOpen(false)}
         lang={lang}
+      />
+
+      {/* Executive Magazine Interactive Modal (All Issues & AI Studio Live Applet) */}
+      <MagazineModal
+        isOpen={magazineModalOpen}
+        onClose={() => setMagazineModalOpen(false)}
+        lang={lang}
+        onOpenFullPageView={() => {
+          setActiveView('magazine');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onConsultationBook={() => {
+          setActiveView('store');
+          scrollToCatalog();
+        }}
       />
 
       {/* Floating WhatsApp Contact Button for Instant Customer Service (hidden during checkout) */}
