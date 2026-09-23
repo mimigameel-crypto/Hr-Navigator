@@ -11,7 +11,8 @@ import {
   Search,
   TrendingUp,
   Users,
-  Star
+  Star,
+  BookOpen
 } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../translations';
@@ -23,6 +24,7 @@ interface HeroProps {
   onJoin: () => void;
   onQuickPay: () => void;
   onShare: () => void;
+  onOpenMagazine?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -30,7 +32,8 @@ export const Hero: React.FC<HeroProps> = ({
   onExplore,
   onJoin,
   onQuickPay,
-  onShare
+  onShare,
+  onOpenMagazine
 }) => {
   const t = translations[lang];
   const isArabic = lang === 'ar';
@@ -173,6 +176,18 @@ export const Hero: React.FC<HeroProps> = ({
             >
               <span>{t.joinNow}</span>
             </button>
+
+            {onOpenMagazine && (
+              <button
+                id="hero-btn-magazine-full"
+                type="button"
+                onClick={onOpenMagazine}
+                className="w-full sm:w-auto px-6 py-4 rounded-xl border border-[#d4af37]/60 bg-gradient-to-r from-[#d4af37]/15 to-[#ffd700]/10 hover:from-[#d4af37]/25 hover:to-[#ffd700]/20 text-[#ffd700] font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_2px_15px_rgba(212,175,55,0.2)] cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4 text-[#d4af37]" />
+                <span>{isArabic ? 'المجلة التنفيذية 📖' : 'HR Magazine 📖'}</span>
+              </button>
+            )}
 
             <button
               id="hero-btn-share-client"

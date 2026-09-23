@@ -7,14 +7,16 @@ import {
   CreditCard, 
   Calendar, 
   HelpCircle, 
-  FileText,
-  Building2,
-  ArrowUpRight,
-  Sun,
-  Moon,
-  Clock
+  FileText, 
+  Building2, 
+  ArrowUpRight, 
+  Sun, 
+  Moon, 
+  Clock,
+  Video
 } from 'lucide-react';
 import { Language } from '../types';
+import { CalendarBookingModal } from './CalendarBookingModal';
 
 interface FloatingWhatsAppProps {
   lang: Language;
@@ -31,6 +33,7 @@ interface QuickReply {
 
 export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [customMsg, setCustomMsg] = useState('');
   const isArabic = lang === 'ar';
 
@@ -128,6 +131,10 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
   ];
 
   const handleQuickReplyClick = (reply: QuickReply) => {
+    if (reply.id === 'discovery-call') {
+      setIsCalendarOpen(true);
+      return;
+    }
     const textToSend = isArabic ? reply.msgAr : reply.msgEn;
     const directUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(textToSend)}`;
     window.open(directUrl, '_blank', 'noopener,noreferrer');
@@ -228,6 +235,44 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
               </div>
             </div>
 
+            {/* Direct Google Calendar Discovery Call Feature Card */}
+            <div className="p-3 rounded-2xl bg-gradient-to-r from-[#172033] to-[#121526] border border-[#4285F4]/40 shadow-lg relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#4285F4]/10 rounded-full blur-xl pointer-events-none" />
+              <div className="flex items-start justify-between gap-2.5 relative">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-[#4285F4]/20 border border-[#4285F4]/50 flex items-center justify-center text-[#4285F4] flex-shrink-0 mt-0.5">
+                    <Calendar className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-white">
+                        {isArabic ? 'حجز جلسة استكشافية فورية' : 'Instant Discovery Call'}
+                      </span>
+                      <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#4285F4]/20 text-[#60a5fa] border border-[#4285F4]/30">
+                        Google Calendar
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#94a3b8] mt-0.5 leading-snug">
+                      {isArabic 
+                        ? 'احجز موعداً مباشراً مع المستشار مع مزامنة فورية على تقويمك بدون الحاجة لبدء محادثة شات'
+                        : 'Book a 45-min slot with an HR advisor synced straight to your Google Calendar.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                id="btn-whatsapp-open-calendar-modal"
+                type="button"
+                onClick={() => setIsCalendarOpen(true)}
+                className="mt-2.5 w-full py-2 px-3 rounded-xl bg-gradient-to-r from-[#4285F4] to-[#2563eb] hover:brightness-110 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+              >
+                <Video className="w-3.5 h-3.5" />
+                <span>{isArabic ? 'تحديد موعد الجلسة في التقويم الآن' : 'Schedule Discovery Slot on Calendar'}</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
             {/* Quick Reply Buttons Section */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[#ffd700]/90 tracking-wider">
@@ -299,9 +344,23 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
         </div>
       )}
 
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button & Direct Discovery Call Pill */}
       <div className="flex items-center gap-2">
-        {/* Floating Tooltip Pill (Desktop) - Compact & Sleek */}
+        {/* Direct Discovery Call Pill (Desktop & Tablet) */}
+        {!isOpen && (
+          <button
+            id="btn-floating-calendar-booking-pill"
+            type="button"
+            onClick={() => setIsCalendarOpen(true)}
+            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#121624]/95 border border-[#4285F4]/50 text-[#60a5fa] text-[11px] font-bold shadow-lg backdrop-blur-md hover:border-[#4285F4] hover:bg-[#1a2138] hover:text-white transition-all cursor-pointer group whitespace-nowrap"
+            title={isArabic ? 'احجز مكالمة استكشافية مباشرة في تقويم Google' : 'Book a Discovery Call directly on Google Calendar'}
+          >
+            <Calendar className="w-3.5 h-3.5 text-[#4285F4] group-hover:rotate-6 transition-transform" />
+            <span>{isArabic ? 'حجز مكالمة استكشافية' : 'Book Discovery Call'}</span>
+          </button>
+        )}
+
+        {/* Floating Tooltip Pill (Desktop) - WhatsApp */}
         {!isOpen && (
           <button
             id="btn-floating-whatsapp-pill"
@@ -338,6 +397,13 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
           )}
         </button>
       </div>
+
+      {/* Google Calendar Discovery Booking Modal */}
+      <CalendarBookingModal
+        isOpen={isCalendarOpen}
+        onClose={() => setIsCalendarOpen(false)}
+        lang={lang}
+      />
     </div>
   );
 };

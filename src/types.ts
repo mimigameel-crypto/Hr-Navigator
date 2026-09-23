@@ -2,7 +2,7 @@ export type Language = 'ar' | 'en';
 
 export type Currency = 'SAR' | 'AED' | 'KWD' | 'QAR' | 'BHD' | 'OMR' | 'USD' | 'EGP';
 
-export type ActiveView = 'store' | 'client_portal' | 'admin';
+export type ActiveView = 'store' | 'client_portal' | 'admin' | 'magazine';
 
 export type OrderStatus = 'new' | 'processing' | 'completed' | 'cancelled';
 
@@ -68,12 +68,26 @@ export interface LuxuryService {
   titleEn: string;
   categoryAr: string;
   categoryEn: string;
+  serviceType?: 'consulting' | 'training' | 'advisory';
   price: number;
   originalPrice?: number;
   studentDiscountPrice?: number;
   exactPrices?: Partial<Record<Currency, number>>;
   exactOriginalPrices?: Partial<Record<Currency, number>>;
   exactStudentPrices?: Partial<Record<Currency, number>>;
+  pricePrefixAr?: string; // e.g. "يبدأ من"
+  pricePrefixEn?: string; // e.g. "Starts from"
+  customPriceNoteAr?: string; // e.g. "22% من الراتب السنوي للمرشح – بحد أدنى وفق مستوى الوظيفة"
+  customPriceNoteEn?: string;
+  singleLineOutcomeAr?: string;
+  singleLineOutcomeEn?: string;
+  keyDeliverablesAr?: string[]; // 3 main deliverables
+  keyDeliverablesEn?: string[];
+  estimatedDurationAr?: string; // e.g. "8–12 أسبوعًا"
+  estimatedDurationEn?: string;
+  suitableForAr?: string;
+  suitableForEn?: string;
+  primaryActionType?: 'request_custom_quote' | 'book_diagnostic' | 'instant_enroll';
   image: string;
   descriptionAr: string;
   descriptionEn: string;

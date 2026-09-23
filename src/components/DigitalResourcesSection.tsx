@@ -36,6 +36,7 @@ interface DigitalResourcesSectionProps {
   onBuyResource: (resource: DigitalResource) => void;
   resources?: DigitalResource[];
   socialPosts?: SocialPost[];
+  onOpenMagazinePage?: () => void;
 }
 
 export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = ({
@@ -43,7 +44,8 @@ export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = (
   currentCurrency,
   onBuyResource,
   resources = initialDigitalResources,
-  socialPosts = initialSocialPosts
+  socialPosts = initialSocialPosts,
+  onOpenMagazinePage
 }) => {
   const isArabic = lang === 'ar';
   const [activeTab, setActiveTab] = useState<'all' | 'free' | 'paid'>('all');
@@ -172,20 +174,32 @@ export const DigitalResourcesSection: React.FC<DigitalResourcesSectionProps> = (
             </div>
 
             <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
+              {onOpenMagazinePage && (
+                <button
+                  id="btn-open-magazine-full-page"
+                  type="button"
+                  onClick={onOpenMagazinePage}
+                  className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FFF0C2] via-[#d4af37] to-[#c59b27] text-black font-extrabold text-xs sm:text-sm shadow-[0_4px_25px_rgba(212,175,55,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <BookOpen className="w-4 h-4 text-black" />
+                  <span>{isArabic ? 'فتح صفحة المجلة بكامل إصداراتها ومقالاتها' : 'Open Full Magazine (All Editions)'}</span>
+                </button>
+              )}
+
               <a
                 id="btn-magazine-spotlight-read"
                 href="https://acrobat.adobe.com/id/urn:aaid:sc:AP:51c1e71e-ce7b-42c2-b096-559afa41da50"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#FFF0C2] via-[#d4af37] to-[#c59b27] text-black font-extrabold text-xs sm:text-sm shadow-[0_4px_25px_rgba(212,175,55,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <Download className="w-4 h-4 text-black" />
-                <span>{isArabic ? 'قراءة وتحميل المجلة (PDF عبر Adobe)' : 'Read & Download Magazine (Adobe)'}</span>
-                <ExternalLink className="w-4 h-4 text-black opacity-70" />
+                <Download className="w-3.5 h-3.5 text-[#ffd700]" />
+                <span>{isArabic ? 'تحميل مباشر (Adobe PDF)' : 'Direct PDF Download'}</span>
+                <ExternalLink className="w-3.5 h-3.5 opacity-70" />
               </a>
 
               <span className="text-[11px] text-center text-[#9ea3b5]">
-                {isArabic ? '⚡ فتح فوري وتصفح عالي الدقة بدون أي تسجيل' : '⚡ Instant high-res view without registration'}
+                {isArabic ? '⚡ تصفح تفاعلي كامل مع جميع الأعداد السابقة والجديدة' : '⚡ Interactive browsing with past & latest editions'}
               </span>
             </div>
           </div>

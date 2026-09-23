@@ -15,6 +15,7 @@ import { AdminDashboard } from './components/AdminDashboard';
 import { AuthModal } from './components/AuthModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { InvoiceModal } from './components/InvoiceModal';
+import { ContractModal } from './components/ContractModal';
 import { ManualOrderModal } from './components/ManualOrderModal';
 import { CartDrawer } from './components/CartDrawer';
 import { Footer } from './components/Footer';
@@ -25,8 +26,11 @@ import { AdminSecurityModal } from './components/AdminSecurityModal';
 import { HRHealthCheckSection } from './components/HRHealthCheckSection';
 import { ShareModal } from './components/ShareModal';
 import { DigitalResourcesSection } from './components/DigitalResourcesSection';
+import { GoogleDriveModal } from './components/GoogleDriveModal';
+import { MagazinePageView } from './components/MagazinePageView';
 import { DigitalResource, SocialPost } from './types';
 import { initialDigitalResources, initialSocialPosts } from './data/resourcesData';
+import { CloudService } from './lib/cloudService';
 
 export default function App() {
   // Language state (persisted)
@@ -180,9 +184,11 @@ export default function App() {
   const [checkoutItems, setCheckoutItems] = useState<OrderItem[]>([]);
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [contractModalOpen, setContractModalOpen] = useState(false);
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState<Order | null>(null);
   const [manualOrderModalOpen, setManualOrderModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [googleDriveModalOpen, setGoogleDriveModalOpen] = useState(false);
 
   // Sync HTML tag direction & lang
   useEffect(() => {
@@ -196,10 +202,23 @@ export default function App() {
     localStorage.setItem('hrn_currency', currency);
   }, [currency]);
 
-  // Persist orders
+  // Persist orders to local storage & active cloud
   useEffect(() => {
     localStorage.setItem('hrn_orders', JSON.stringify(orders));
+    // Asynchronously push to active cloud connection
+    CloudService.syncDoc('system_data', 'orders_archive', { orders }).catch(() => {});
   }, [orders]);
+
+  // Listen to cloud updates when switching connections
+  useEffect(() => {
+    const unsub = CloudService.subscribe(async () => {
+      const remote = await CloudService.readDoc('system_data', 'orders_archive');
+      if (remote && Array.isArray(remote.orders) && remote.orders.length > 0) {
+        setOrders(remote.orders);
+      }
+    });
+    return () => unsub();
+  }, []);
 
   // Persist user
   useEffect(() => {
@@ -332,6 +351,37 @@ export default function App() {
     setInvoiceModalOpen(true);
   };
 
+  // Preview sample official tax invoice for visitors
+  const handleViewSampleInvoice = () => {
+    const sampleOrder: Order = {
+      id: 'sample-inv-001',
+      orderNumber: 'HRN-2026-INV-1001',
+      customerName: currentUser?.name || (lang === 'ar' ? 'شركة الرواد للاستثمار والتقنية' : 'Al-Ruwad Tech & Investment Group'),
+      customerEmail: currentUser?.email || 'finance@alruwad-group.com',
+      customerPhone: currentUser?.phone || '+966 50 123 4567',
+      customerAddress: lang === 'ar' ? 'الرياض - حي العليا، المملكة العربية السعودية' : 'Olaya District, Riyadh, Saudi Arabia',
+      items: [
+        {
+          serviceId: services[0].id,
+          titleAr: services[0].titleAr,
+          titleEn: services[0].titleEn,
+          price: services[0].price,
+          quantity: 1
+        }
+      ],
+      subtotal: services[0].price,
+      tax: Math.round(services[0].price * 0.15),
+      total: Math.round(services[0].price * 1.15),
+      status: 'completed',
+      paymentStatus: 'paid',
+      createdAt: new Date().toISOString(),
+      paymentMethod: 'card',
+      currency: currency
+    };
+    setSelectedInvoiceOrder(sampleOrder);
+    setInvoiceModalOpen(true);
+  };
+
   // Add manual order in admin
   const handleAddManualOrder = (order: Order) => {
     setOrders(prev => [order, ...prev]);
@@ -389,6 +439,10 @@ export default function App() {
               }}
               onQuickPay={handleQuickCheckout}
               onShare={() => setShareModalOpen(true)}
+              onOpenMagazine={() => {
+                setActiveView('magazine');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
 
             {/* 6 Specialization Pillars Strip */}
@@ -420,8 +474,25 @@ export default function App() {
               onBuyResource={handleBuyResource}
               resources={digitalResources}
               socialPosts={socialPosts}
+              onOpenMagazinePage={() => {
+                setActiveView('magazine');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           </>
+        ) : activeView === 'magazine' ? (
+          /* Dedicated Executive Magazine Full Page View */
+          <MagazinePageView
+            lang={lang}
+            onBackToStore={() => {
+              setActiveView('store');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onConsultationBook={() => {
+              setActiveView('store');
+              scrollToCatalog();
+            }}
+          />
         ) : activeView === 'client_portal' ? (
           /* Client & Subscriber Dedicated Area */
           <ClientPortal
@@ -454,6 +525,8 @@ export default function App() {
               socialPosts={socialPosts}
               onAddSocialPost={handleAddSocialPost}
               onDeleteSocialPost={handleDeleteSocialPost}
+              onOpenContractModal={() => setContractModalOpen(true)}
+              onViewSampleInvoice={handleViewSampleInvoice}
             />
           ) : (
             <div className="max-w-md mx-auto py-20 px-4 text-center space-y-4">
@@ -483,6 +556,10 @@ export default function App() {
           setAuthModalOpen(true);
         }}
         onRequestAdminAccess={() => setAdminSecurityModalOpen(true)}
+        onOpenMagazine={() => {
+          setActiveView('magazine');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {/* Owner Security PIN Modal */}
@@ -541,6 +618,14 @@ export default function App() {
         onClose={() => setInvoiceModalOpen(false)}
       />
 
+      {/* Official Consulting Contract Modal */}
+      <ContractModal
+        isOpen={contractModalOpen}
+        onClose={() => setContractModalOpen(false)}
+        lang={lang}
+        clientName={currentUser?.name}
+      />
+
       {/* Admin Manual Order Modal */}
       <ManualOrderModal
         isOpen={manualOrderModalOpen}
@@ -555,6 +640,13 @@ export default function App() {
         isOpen={shareModalOpen}
         lang={lang}
         onClose={() => setShareModalOpen(false)}
+      />
+
+      {/* Google Workspace Drive Storage Modal */}
+      <GoogleDriveModal
+        isOpen={googleDriveModalOpen}
+        onClose={() => setGoogleDriveModalOpen(false)}
+        lang={lang}
       />
 
       {/* Floating WhatsApp Contact Button for Instant Customer Service (hidden during checkout) */}

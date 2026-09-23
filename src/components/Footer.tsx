@@ -26,13 +26,15 @@ interface FooterProps {
   onExplore: () => void;
   onOpenAuth: (mode: 'login' | 'register') => void;
   onRequestAdminAccess?: () => void;
+  onOpenMagazine?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
   lang,
   onExplore,
   onOpenAuth,
-  onRequestAdminAccess
+  onRequestAdminAccess,
+  onOpenMagazine
 }) => {
   const t = translations[lang];
   const isArabic = lang === 'ar';
@@ -120,6 +122,20 @@ export const Footer: React.FC<FooterProps> = ({
                   {t.exploreCatalog}
                 </button>
               </li>
+              {onOpenMagazine && (
+                <li>
+                  <button 
+                    type="button" 
+                    onClick={onOpenMagazine} 
+                    className="text-[#ffd700] hover:text-white font-bold transition-colors flex items-center gap-1.5"
+                  >
+                    <span>{isArabic ? 'مجلة HR Navigator (كامل الأعداد)' : 'HR Magazine (All Editions)'}</span>
+                    <span className="px-1.5 py-0.2 rounded text-[9px] bg-[#d4af37]/20 border border-[#d4af37]/40">
+                      PDF
+                    </span>
+                  </button>
+                </li>
+              )}
               <li>
                 <button type="button" onClick={() => onOpenAuth('register')} className="hover:text-white transition-colors">
                   {t.register}

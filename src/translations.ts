@@ -102,6 +102,26 @@ export const translations = {
     studentDiscountAppliedTag: 'تم تطبيق خصم طلبة الجامعة بنجاح',
     removeStudentDiscount: 'إلغاء الخصم',
 
+    // Consulting & Service Cards Overhaul
+    unifiedPricingNotice: 'الأسعار استرشادية وتُحدد نهائيًا وفق عدد الموظفين والفروع والوظائف ونطاق التنفيذ. الأسعار لا تشمل الضرائب أو التراخيص أو مصروفات الانتقال – إن وجدت.',
+    requestCustomQuote: 'اطلب عرضًا مخصصًا',
+    bookDiagnosticConsultation: 'احجز استشارة تشخيصية',
+    viewServiceDetails: 'عرض التفاصيل',
+    estimatedDuration: 'مدة التنفيذ التقديرية',
+    keyDeliverables: 'أهم 3 مخرجات رئيسية',
+    targetOutcome: 'النتيجة المستهدفة',
+    suitableFor: 'مناسبة لـ',
+    startingFrom: 'يبدأ من',
+    customQuoteModalTitle: 'طلب عرض استشاري مخصص',
+    customQuoteModalSubtitle: 'سجل تفاصيل منشأتك لنقوم بإعداد عرض فني ومالي دقيق يتوافق مع نطاق احتياجاتك بدقة.',
+    companyName: 'اسم الشركة / المؤسسة',
+    employeeCount: 'عدد الموظفين التقريبي',
+    branchesCount: 'عدد الفروع / المواقع',
+    industrySector: 'قطاع العمل / النشاط',
+    consultingScopeNotes: 'وصف مختصر للتحدي أو نطاق العمل المطلوب',
+    sendQuoteRequest: 'إرسال طلب العرض المخصص',
+    quoteRequestSuccess: 'تم استلام طلبك بنجاح! سيتواصل معك فريق الاستشارات في HR Navigator خلال ساعات العمل.',
+
     // Course Details Modal
     viewCourseDetails: 'عرض التفاصيل الكاملة والمحاور',
     courseDetailsTitle: 'الدليل التدريبي الشامل للمحتوى والمحاور',
@@ -299,6 +319,26 @@ export const translations = {
     studentIdUploadSuccess: 'Student ID card uploaded successfully',
     studentDiscountAppliedTag: 'University Student Discount applied successfully',
     removeStudentDiscount: 'Remove Discount',
+
+    // Consulting & Service Cards Overhaul
+    unifiedPricingNotice: 'Prices are indicative and determined finally based on staff headcount, branches, job hierarchy, and execution scope. Prices exclude taxes, licenses, or travel expenses (if any).',
+    requestCustomQuote: 'Request Custom Proposal',
+    bookDiagnosticConsultation: 'Book Diagnostic Consultation',
+    viewServiceDetails: 'View Details',
+    estimatedDuration: 'Estimated Timeline',
+    keyDeliverables: 'Key 3 Deliverables',
+    targetOutcome: 'Target Outcome',
+    suitableFor: 'Suitable for',
+    startingFrom: 'Starts from',
+    customQuoteModalTitle: 'Request a Custom Advisory Proposal',
+    customQuoteModalSubtitle: 'Provide your organization details so our advisory team can tailor an accurate technical and financial proposal.',
+    companyName: 'Company / Organization Name',
+    employeeCount: 'Approximate Employee Count',
+    branchesCount: 'Number of Branches / Sites',
+    industrySector: 'Industry / Sector',
+    consultingScopeNotes: 'Brief description of the challenge or scope of work',
+    sendQuoteRequest: 'Submit Proposal Request',
+    quoteRequestSuccess: 'Your request has been received! The HR Navigator advisory team will contact you shortly.',
 
     // Course Details Modal
     viewCourseDetails: 'View Complete Syllabus & Details',

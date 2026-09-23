@@ -13,7 +13,9 @@ import {
   Building,
   Lock,
   Share2,
-  FileText
+  FileText,
+  HardDrive,
+  BookOpen
 } from 'lucide-react';
 import { Language, User, Currency, ActiveView } from '../types';
 import { translations } from '../translations';
@@ -91,21 +93,23 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>{t.clientStore}</span>
           </button>
 
-          {/* 2. Digital Library & Magazine Button */}
-          {onNavigateResources && (
-            <button
-              id="nav-btn-resources"
-              type="button"
-              onClick={() => {
-                onToggleView('store');
-                onNavigateResources();
-              }}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold text-[#9ea3b5] hover:text-[#ffd700] hover:bg-[#1f212d]/40 transition-all cursor-pointer"
-            >
-              <FileText className="w-3.5 h-3.5 text-[#d4af37]" />
-              <span>{isArabic ? 'المجلة والمكتبة الرقمية (PDF)' : 'Magazine & PDF Library'}</span>
-            </button>
-          )}
+          {/* 2. Executive Magazine Full Page View */}
+          <button
+            id="nav-btn-magazine"
+            type="button"
+            onClick={() => onToggleView('magazine')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeView === 'magazine'
+                ? 'bg-gradient-to-r from-[#d4af37]/25 to-[#c59b27]/25 text-[#ffd700] border border-[#d4af37]/50 shadow-sm'
+                : 'text-[#9ea3b5] hover:text-[#ffd700] hover:bg-[#1f212d]/40'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5 text-[#d4af37]" />
+            <span>{isArabic ? 'مجلة HR Navigator التنفيذية' : 'HR Magazine'}</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#d4af37]/20 text-[#ffd700] border border-[#d4af37]/40">
+              {isArabic ? 'جديد' : 'New'}
+            </span>
+          </button>
 
           {/* 3. Client & Subscriber Portal */}
           <button
@@ -320,21 +324,25 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
-            {/* Mobile Digital Library Button */}
-            {onNavigateResources && (
-              <button
-                type="button"
-                onClick={() => {
-                  onToggleView('store');
-                  onNavigateResources();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold bg-[#181a28] text-[#ffd700] border border-[#d4af37]/30"
-              >
-                <FileText className="w-4 h-4 text-[#d4af37]" />
-                <span>{isArabic ? 'المجلة والمكتبة الرقمية (PDF)' : 'Magazine & PDF Library'}</span>
-              </button>
-            )}
+            {/* Mobile Magazine Button */}
+            <button
+              type="button"
+              onClick={() => {
+                onToggleView('magazine');
+                setMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold border transition-colors ${
+                activeView === 'magazine'
+                  ? 'bg-[#d4af37] text-black border-[#d4af37]'
+                  : 'bg-[#181a28] text-[#ffd700] border-[#d4af37]/30'
+              }`}
+            >
+              <BookOpen className="w-4 h-4 text-[#d4af37]" />
+              <span>{isArabic ? 'مجلة HR Navigator التنفيذية' : 'HR Magazine'}</span>
+              <span className="px-1.5 py-0.2 rounded text-[10px] bg-black/30 font-mono">
+                {isArabic ? 'كامل الأعداد' : 'All Issues'}
+              </span>
+            </button>
 
             {/* Mobile Share Link Button */}
             <button

@@ -121,28 +121,36 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  // Check if cart contains HR for Juniors
-  const hasHRForJuniors = items.some(i => i.serviceId === 'srv-trn-jun-02' || i.sku === 'HRN-TRN-JUN');
+  // Check if cart contains HR for Juniors or any training course
+  const hasHRForJuniors = items.some(i => i.serviceId === 'srv-trn-jun-02' || i.sku === 'HRN-TRN-JUN' || i.sku === 'HRN-TRN-JUN-02');
   const studentDiscountActive = isStudentCheckout && Boolean(studentIdCardUrl);
 
   // Calculate unit price in active currency with exactPrices and student discount support
   const getItemUnitPrice = (item: OrderItem): number => {
-    const isJuniors = item.serviceId === 'srv-trn-jun-02' || item.sku === 'HRN-TRN-JUN';
+    const isJuniors = item.serviceId === 'srv-trn-jun-02' || item.sku === 'HRN-TRN-JUN' || item.sku === 'HRN-TRN-JUN-02';
     if (isJuniors) {
       if (studentDiscountActive) {
-        // Discounted Student Price: 3,000 EGP (or converted from 227 SAR)
+        // 45% Student Discount applied at checkout: 1,650 EGP (from 3,000 EGP base)
+        if (currentCurrency === 'EGP') return 1650;
+        if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
+          return Math.round(item.exactPrices[currentCurrency]! * 0.55);
+        }
+        return Math.round(convertFromSAR(item.price, currentCurrency) * 0.55);
+      } else {
+        // Standard Base Price shown outside: 3,000 EGP (or 227 SAR)
         if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
           return item.exactPrices[currentCurrency]!;
         }
         return convertFromSAR(item.price, currentCurrency);
-      } else {
-        // Standard Non-Student Price: 4,500 EGP (or 340 SAR)
-        if (item.exactOriginalPrices && item.exactOriginalPrices[currentCurrency] !== undefined) {
-          return item.exactOriginalPrices[currentCurrency]!;
-        }
-        const origSar = item.originalPrice || 340;
-        return convertFromSAR(origSar, currentCurrency);
       }
+    }
+
+    if (studentDiscountActive && item.serviceId?.includes('trn')) {
+      // 45% discount for any training course when student ID is verified
+      const basePrice = item.exactPrices && item.exactPrices[currentCurrency] !== undefined
+        ? item.exactPrices[currentCurrency]!
+        : convertFromSAR(item.price, currentCurrency);
+      return Math.round(basePrice * 0.55);
     }
 
     if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
@@ -151,16 +159,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     return convertFromSAR(item.price, currentCurrency);
   };
 
-  // Standard (non-discounted) price for reference
+  // Standard (non-discounted) price for reference (3,000 EGP base for Juniors)
   const getItemStandardUnitPrice = (item: OrderItem): number => {
-    const isJuniors = item.serviceId === 'srv-trn-jun-02' || item.sku === 'HRN-TRN-JUN';
-    if (isJuniors) {
-      if (item.exactOriginalPrices && item.exactOriginalPrices[currentCurrency] !== undefined) {
-        return item.exactOriginalPrices[currentCurrency]!;
-      }
-      const origSar = item.originalPrice || 340;
-      return convertFromSAR(origSar, currentCurrency);
-    }
     if (item.exactPrices && item.exactPrices[currentCurrency] !== undefined) {
       return item.exactPrices[currentCurrency]!;
     }
@@ -506,8 +506,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
                     <p className="text-[11px] text-[#9ea3b5] font-normal mt-0.5">
                       {isArabic 
-                        ? 'تطبيق خصم كورس HR for Juniors (3,000 ج.م بدلاً من 4,500 ج.م) لطلبة الجامعات عند إرفاق صورة كارنيه الجامعة.'
-                        : 'Apply HR for Juniors Student Discount (3,000 EGP instead of 4,500 EGP) by uploading your university student ID.'}
+                        ? 'تطبيق خصم طلاب الجامعة على كورس HR for Juniors بنسبة 45% (1,650 ج.م بدلاً من 3,000 ج.م السعر الأساسي) عند رفع صورة كارنيه الجامعة.'
+                        : 'Apply HR for Juniors 45% Student Discount (1,650 EGP instead of 3,000 EGP base price) by uploading your university student ID.'}
                     </p>
                   </label>
                 </div>

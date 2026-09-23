@@ -145,6 +145,7 @@ export const ClientPortal: React.FC<ClientPortalProps> = ({
               {isArabic ? 'استعراض الباقات والاستشارات' : 'Browse Consultations'}
             </button>
           </div>
+
         </div>
       ) : (
         <div className="space-y-8">
