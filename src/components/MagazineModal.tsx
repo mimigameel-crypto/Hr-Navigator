@@ -11,7 +11,8 @@ import {
   RefreshCw,
   Layers,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  AlertCircle
 } from 'lucide-react';
 import { Language } from '../types';
 import { MAGAZINE_ISSUES } from '../data/magazineData';
@@ -38,7 +39,7 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hasIframeError, setHasIframeError] = useState(false);
 
   if (!isOpen) return null;
 
@@ -51,8 +52,19 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
   };
 
   const handleRefresh = () => {
-    setIsLoading(true);
+    setHasIframeError(false);
     setIframeKey(prev => prev + 1);
+  };
+
+  const handleOpenExternal = () => {
+    window.open(AI_STUDIO_MAGAZINE_APPLET_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleGoToFullPage = () => {
+    onClose();
+    if (onOpenFullPageView) {
+      onOpenFullPageView();
+    }
   };
 
   return (
@@ -78,11 +90,11 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm sm:text-base font-bold text-white tracking-wide">
-                  {isArabic ? 'مجلة HR Navigator التنفيذية — التطبيق السحابي الكامل' : 'HR Navigator Executive Magazine — Live Applet'}
+                  {isArabic ? 'مجلة HR Navigator التنفيذية' : 'HR Navigator Executive Magazine'}
                 </h3>
                 <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#4285F4]/20 text-[#60a5fa] border border-[#4285F4]/40">
                   <Sparkles className="w-3 h-3 text-[#4285F4]" />
-                  <span>{isArabic ? 'متزامن لحظياً ومباشر' : 'Live Sync'}</span>
+                  <span>{isArabic ? 'متزامن لحظياً' : 'Live Sync'}</span>
                 </span>
                 <span className="hidden md:inline px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#d4af37]/15 text-[#ffd700] border border-[#d4af37]/30">
                   {isArabic ? `${issues.length} أعداد معتمدة` : `${issues.length} Editions`}
@@ -90,22 +102,33 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
               </div>
               <p className="text-[11px] text-[#8a8d9a] hidden sm:block">
                 {isArabic 
-                  ? 'عرض مباشر لنفس رابط وتطبيق المجلة السحابي — أي تحديث تجريه هناك يظهر لك هنا فوراً عند التحديث.' 
-                  : 'Live instance of the magazine cloud applet — Any update you deploy updates automatically here.'}
+                  ? 'أي تحديث تجريه على الرابط السحابي هناك يظهر لك فوراً هنا وفي التطبيق المباشر' 
+                  : 'Any update you publish on the cloud instance updates automatically here'}
               </p>
             </div>
           </div>
 
           {/* Right Header Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Open in external browser tab button */}
+            <button
+              type="button"
+              onClick={handleOpenExternal}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#4285F4] to-[#2563EB] hover:brightness-110 text-white text-xs font-bold transition-all shadow-md cursor-pointer"
+              title={isArabic ? 'فتح الرابط في نافذة جديدة' : 'Open in New Tab'}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>{isArabic ? 'فتح في نافذة جديدة' : 'Open in New Tab'}</span>
+            </button>
+
             {/* Reload iFrame Button */}
             <button
               type="button"
               onClick={handleRefresh}
               className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#9ea3b5] hover:text-white transition-colors cursor-pointer"
-              title={isArabic ? 'تحديث ومزامنة المجلة الآن' : 'Refresh and sync live changes'}
+              title={isArabic ? 'تحديث' : 'Refresh'}
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#ffd700]' : ''}`} />
+              <RefreshCw className="w-4 h-4" />
             </button>
 
             {/* Toggle Fullscreen / Windowed */}
@@ -117,18 +140,6 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </button>
-
-            {/* Open in external browser tab */}
-            <a
-              href={AI_STUDIO_MAGAZINE_APPLET_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#4285F4]/20 to-[#2563EB]/20 border border-[#4285F4]/50 hover:border-[#4285F4] text-[#60a5fa] text-xs font-bold transition-all"
-              title={isArabic ? 'فتح في علامة تبويب مستقلة' : 'Open in new browser tab'}
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{isArabic ? 'فتح بنافذة جديدة' : 'Open in New Tab'}</span>
-            </a>
 
             {/* Share Link */}
             <button
@@ -153,68 +164,74 @@ export const MagazineModal: React.FC<MagazineModalProps> = ({
           </div>
         </div>
 
-        {/* Informative Sub-bar: Realtime Sync Reassurance */}
-        <div className="px-4 sm:px-6 py-2 bg-[#0c0e18] border-b border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs flex-shrink-0">
+        {/* Sub-bar: Direct actions and advice */}
+        <div className="px-4 sm:px-6 py-2.5 bg-[#0c0e18] border-b border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs flex-shrink-0">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-            <span className="text-[#9ea3b5]">
-              {isArabic ? (
-                <>
-                  سحابة المجلة متصلة بالرابط الرسمي: <span className="font-mono text-[#60a5fa]">aistudio.google.com/apps/500e0d19...</span>
-                </>
-              ) : (
-                <>
-                  Cloud connected directly to: <span className="font-mono text-[#60a5fa]">aistudio.google.com/apps/500e0d19...</span>
-                </>
-              )}
+            <span className="text-[#cbd5e1] font-mono text-[11px]">
+              https://aistudio.google.com/apps/500e0d19...
             </span>
           </div>
 
-          <div className="flex items-center gap-3">
-            {onOpenFullPageView && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onOpenFullPageView();
-                }}
-                className="text-[11px] text-[#d4af37] hover:underline flex items-center gap-1 font-bold cursor-pointer"
-              >
-                <Layers className="w-3 h-3" />
-                <span>{isArabic ? 'فهرس الأعداد والمقالات النصية' : 'View Text Articles Directory'}</span>
-                {isArabic ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
-              </button>
-            )}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleGoToFullPage}
+              className="px-3 py-1 rounded-lg bg-[#d4af37]/15 hover:bg-[#d4af37]/25 border border-[#d4af37]/40 text-[#ffd700] flex items-center gap-1.5 font-bold transition-all cursor-pointer"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>{isArabic ? 'عرض صفحة المجلة والأعداد المدمجة بالمنصة' : 'In-App Magazine View'}</span>
+              {isArabic ? <ArrowLeft className="w-3 h-3" /> : <ArrowRight className="w-3 h-3" />}
+            </button>
           </div>
         </div>
 
-        {/* Modal Body: Full Page Live iFrame of the exact URL provided */}
-        <div className="flex-1 w-full h-full relative bg-[#000000] overflow-hidden">
-          {isLoading && (
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0a0c13] text-[#9ea3b5] gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#d4af37]/15 border border-[#d4af37]/40 flex items-center justify-center text-[#ffd700] animate-pulse">
-                <BookOpen className="w-6 h-6" />
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-white">
-                  {isArabic ? 'جارٍ تحميل صفحة وتطبيق المجلة الكامل...' : 'Loading full live magazine applet...'}
-                </p>
-                <p className="text-xs text-[#8a8d9a] mt-1">
-                  {isArabic ? 'يتم جلب أحدث إصدار وتحديثات الأعداد مباشرة من السحابة' : 'Retrieving latest updates directly from the cloud'}
-                </p>
-              </div>
+        {/* Modal Body: Fallback & Embedded Screen */}
+        <div className="flex-1 w-full h-full relative bg-[#090b12] flex flex-col items-center justify-center p-4">
+          {/* Helpful Banner explaining browser security & offering 1-click solutions */}
+          <div className="max-w-xl w-full p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#131627] to-[#0c0e1a] border-2 border-[#d4af37]/50 shadow-2xl text-center space-y-5">
+            <div className="w-16 h-16 rounded-2xl bg-[#4285F4]/15 border border-[#4285F4]/40 flex items-center justify-center text-[#60a5fa] mx-auto shadow-lg">
+              <Sparkles className="w-8 h-8" />
             </div>
-          )}
 
-          <iframe
-            key={iframeKey}
-            src={AI_STUDIO_MAGAZINE_APPLET_URL}
-            title="HR Navigator Executive Magazine Live Applet"
-            className="w-full h-full border-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-            onLoad={() => setIsLoading(false)}
-          />
+            <div className="space-y-2">
+              <h2 className="text-lg sm:text-xl font-extrabold text-white">
+                {isArabic ? 'تطبيق مجلة HR Navigator التفاعلي السحابي' : 'HR Navigator Live Cloud Applet'}
+              </h2>
+              <p className="text-xs sm:text-sm text-[#9ea3b5] leading-relaxed">
+                {isArabic 
+                  ? 'نظراً لقيود الحماية الأمنية في متصفح جوجل لروابط AI Studio داخل النوافذ المضمنة، يمكنك فتح التطبيق فوراً بنقرة واحدة أو تصفح الأعداد مباشرة داخل المنصة:' 
+                  : 'Due to Google AI Studio iframe embedding security policies, you can open the live cloud applet directly or browse the built-in issue reader:'}
+              </p>
+            </div>
+
+            {/* Direct Big Action Buttons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleOpenExternal}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#4285F4] to-[#2563EB] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-[0_4px_25px_rgba(66,133,244,0.4)] transition-all cursor-pointer"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span>{isArabic ? 'فتح تطبيق المجلة بالرابط المباشر' : 'Open Live Applet Directly'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGoToFullPage}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#FFF0C2] via-[#d4af37] to-[#c59b27] text-black font-extrabold text-xs sm:text-sm shadow-[0_4px_25px_rgba(212,175,55,0.4)] hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>{isArabic ? 'تصفح صفحة المجلة بكافة أعدادها هنا' : 'Browse Issues Inside App'}</span>
+              </button>
+            </div>
+
+            {/* Sync Reassurance */}
+            <div className="pt-3 border-t border-white/5 flex items-center justify-center gap-2 text-[11px] text-[#ffd700]">
+              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{isArabic ? 'ملاحظة: أي تحديث تجريه على الرابط السحابي يظهر لك فوراً بالرابط المباشر' : 'Note: Any update you make to the cloud project is instantly live'}</span>
+            </div>
+          </div>
         </div>
 
       </div>

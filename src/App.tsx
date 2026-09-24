@@ -425,7 +425,10 @@ export default function App() {
         isAdminAuthenticated={isAdminUnlocked || currentUser?.role === 'admin'}
         onOpenShare={() => setShareModalOpen(true)}
         onNavigateResources={scrollToResources}
-        onOpenMagazineModal={() => setMagazineModalOpen(true)}
+        onOpenMagazineModal={() => {
+          setActiveView('magazine');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {/* Main Content Area */}
@@ -442,7 +445,10 @@ export default function App() {
               }}
               onQuickPay={handleQuickCheckout}
               onShare={() => setShareModalOpen(true)}
-              onOpenMagazine={() => setMagazineModalOpen(true)}
+              onOpenMagazine={() => {
+                setActiveView('magazine');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
 
             {/* 6 Specialization Pillars Strip */}
@@ -474,7 +480,10 @@ export default function App() {
               onBuyResource={handleBuyResource}
               resources={digitalResources}
               socialPosts={socialPosts}
-              onOpenMagazinePage={() => setMagazineModalOpen(true)}
+              onOpenMagazinePage={() => {
+                setActiveView('magazine');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           </>
         ) : activeView === 'magazine' ? (
@@ -553,7 +562,10 @@ export default function App() {
           setAuthModalOpen(true);
         }}
         onRequestAdminAccess={() => setAdminSecurityModalOpen(true)}
-        onOpenMagazine={() => setMagazineModalOpen(true)}
+        onOpenMagazine={() => {
+          setActiveView('magazine');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
       {/* Owner Security PIN Modal */}
