@@ -30,6 +30,8 @@ import { GoogleDriveModal } from './components/GoogleDriveModal';
 import { MagazinePageView } from './components/MagazinePageView';
 import { MagazineModal } from './components/MagazineModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
+import { CreativeStudioModal } from './components/CreativeStudioModal';
+import { CreativeStudioPageView } from './components/CreativeStudioPageView';
 import { DigitalResource, SocialPost } from './types';
 import { initialDigitalResources, initialSocialPosts } from './data/resourcesData';
 import { CloudService } from './lib/cloudService';
@@ -71,6 +73,8 @@ export default function App() {
 
   // Modals state
   const [adminSecurityModalOpen, setAdminSecurityModalOpen] = useState(false);
+  const [creativeStudioModalOpen, setCreativeStudioModalOpen] = useState(false);
+  const [creativeStudioInitialImage, setCreativeStudioInitialImage] = useState<string | null>(null);
 
   // User state (persisted)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
@@ -239,6 +243,13 @@ export default function App() {
       if (key === 'm' || key === 'ة') {
         e.preventDefault();
         navigateToMagazine(setActiveView);
+        return;
+      }
+
+      // AI Creative Studio: 'v' or 'ر' (Arabic layout)
+      if (key === 'v' || key === 'ر') {
+        e.preventDefault();
+        setCreativeStudioModalOpen(prev => !prev);
         return;
       }
 
@@ -534,6 +545,7 @@ export default function App() {
         onOpenMagazineModal={() => navigateToMagazine(setActiveView)}
         onOpenDrive={() => setGoogleDriveModalOpen(true)}
         onOpenKeyboardShortcuts={() => setKeyboardShortcutsModalOpen(true)}
+        onOpenCreativeStudio={() => setCreativeStudioModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -552,6 +564,7 @@ export default function App() {
               onShare={() => setShareModalOpen(true)}
               onOpenMagazine={() => navigateToMagazine(setActiveView)}
               setActiveView={setActiveView}
+              onOpenCreativeStudio={() => setCreativeStudioModalOpen(true)}
             />
 
             {/* 6 Specialization Pillars Strip */}
@@ -598,6 +611,16 @@ export default function App() {
               setActiveView('store');
               scrollToCatalog();
             }}
+          />
+        ) : activeView === 'creative_studio' ? (
+          /* Dedicated AI Creative & Media Studio View (Veo 3.1 & Gemini) */
+          <CreativeStudioPageView
+            lang={lang}
+            onBackToStore={() => {
+              setActiveView('store');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onToggleView={setActiveView}
           />
         ) : activeView === 'client_portal' ? (
           /* Client & Subscriber Dedicated Area */
@@ -771,6 +794,14 @@ export default function App() {
         isOpen={keyboardShortcutsModalOpen}
         onClose={() => setKeyboardShortcutsModalOpen(false)}
         lang={lang}
+      />
+
+      {/* AI Creative Studio Modal (Veo 3.1 & Gemini Flash Image) */}
+      <CreativeStudioModal
+        isOpen={creativeStudioModalOpen}
+        onClose={() => setCreativeStudioModalOpen(false)}
+        lang={lang}
+        initialImage={creativeStudioInitialImage}
       />
 
       {/* Floating WhatsApp Contact Button for Instant Customer Service (hidden during checkout) */}

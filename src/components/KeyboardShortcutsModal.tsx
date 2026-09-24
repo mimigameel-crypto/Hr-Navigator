@@ -12,7 +12,8 @@ import {
   ShoppingCart, 
   Globe, 
   HelpCircle,
-  CreditCard
+  CreditCard,
+  Film
 } from 'lucide-react';
 import { Language } from '../types';
 
@@ -43,6 +44,12 @@ export const KeyboardShortcutsModal: React.FC<KeyboardShortcutsModalProps> = ({
       descAr: 'الانتقال إلى مجلة HR Navigator التنفيذية',
       descEn: 'Navigate to HR Navigator Executive Magazine',
       icon: <BookOpen className="w-4 h-4 text-[#ffd700]" />
+    },
+    {
+      keys: ['V'],
+      descAr: 'استوديو الذكاء الاصطناعي وإنتاج الفيديو (Veo 3.1 & Gemini)',
+      descEn: 'AI Creative Studio & Video Production (Veo 3.1 & Gemini)',
+      icon: <Film className="w-4 h-4 text-[#ffd700]" />
     },
     {
       keys: ['D'],

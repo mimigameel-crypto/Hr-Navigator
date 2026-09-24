@@ -2,7 +2,7 @@ export type Language = 'ar' | 'en';
 
 export type Currency = 'SAR' | 'AED' | 'KWD' | 'QAR' | 'BHD' | 'OMR' | 'USD' | 'EGP';
 
-export type ActiveView = 'store' | 'client_portal' | 'admin' | 'magazine';
+export type ActiveView = 'store' | 'client_portal' | 'admin' | 'magazine' | 'creative_studio';
 
 export type OrderStatus = 'new' | 'processing' | 'completed' | 'cancelled';
 

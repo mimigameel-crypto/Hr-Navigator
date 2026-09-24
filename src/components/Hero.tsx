@@ -12,7 +12,8 @@ import {
   TrendingUp,
   Users,
   Star,
-  BookOpen
+  BookOpen,
+  Film
 } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../translations';
@@ -28,6 +29,7 @@ interface HeroProps {
   onShare: () => void;
   onOpenMagazine?: () => void;
   setActiveView?: (view: ActiveView) => void;
+  onOpenCreativeStudio?: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -37,7 +39,8 @@ export const Hero: React.FC<HeroProps> = ({
   onQuickPay,
   onShare,
   onOpenMagazine,
-  setActiveView
+  setActiveView,
+  onOpenCreativeStudio
 }) => {
   const t = translations[lang];
   const isArabic = lang === 'ar';
@@ -198,6 +201,18 @@ export const Hero: React.FC<HeroProps> = ({
               >
                 <BookOpen className="w-4 h-4 text-[#d4af37]" />
                 <span>{isArabic ? 'المجلة التنفيذية 📖' : 'HR Magazine 📖'}</span>
+              </button>
+            )}
+
+            {onOpenCreativeStudio && (
+              <button
+                id="hero-btn-creative-studio"
+                type="button"
+                onClick={onOpenCreativeStudio}
+                className="w-full sm:w-auto px-6 py-4 rounded-xl border border-[#ffd700]/70 bg-gradient-to-r from-[#ffd700]/20 via-[#d4af37]/25 to-[#ffd700]/20 hover:from-[#ffd700]/30 hover:to-[#d4af37]/35 text-[#ffd700] font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_2px_20px_rgba(212,175,55,0.3)] cursor-pointer"
+              >
+                <Film className="w-4 h-4 text-[#ffd700]" />
+                <span>{isArabic ? 'استوديو الفيديو (Veo 3) ✨' : 'Veo 3 Video Studio ✨'}</span>
               </button>
             )}
 

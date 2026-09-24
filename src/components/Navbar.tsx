@@ -17,7 +17,9 @@ import {
   HardDrive,
   BookOpen,
   Keyboard,
-  Cloud
+  Cloud,
+  Sparkles,
+  Film
 } from 'lucide-react';
 import { Language, User, Currency, ActiveView } from '../types';
 import { translations } from '../translations';
@@ -45,6 +47,7 @@ interface NavbarProps {
   onOpenMagazineModal?: () => void;
   onOpenDrive?: () => void;
   onOpenKeyboardShortcuts?: () => void;
+  onOpenCreativeStudio?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -66,7 +69,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onNavigateResources,
   onOpenMagazineModal,
   onOpenDrive,
-  onOpenKeyboardShortcuts
+  onOpenKeyboardShortcuts,
+  onOpenCreativeStudio
 }) => {
   const t = translations[lang];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -126,7 +130,31 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           </button>
 
-          {/* 3. Client & Subscriber Portal */}
+          {/* 3. AI Creative Studio (Veo & Gemini) */}
+          <button
+            id="nav-btn-creative-studio"
+            type="button"
+            onClick={() => {
+              if (onOpenCreativeStudio) {
+                onOpenCreativeStudio();
+              } else {
+                onToggleView('creative_studio');
+              }
+            }}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              activeView === 'creative_studio'
+                ? 'bg-gradient-to-r from-[#d4af37]/35 to-[#ffd700]/30 text-[#ffd700] border border-[#ffd700]/60 shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                : 'text-[#9ea3b5] hover:text-[#ffd700] hover:bg-[#1f212d]/40'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#ffd700] animate-pulse" />
+            <span>{isArabic ? 'استوديو الذكاء الاصطناعي' : 'AI Creative Studio'}</span>
+            <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#ffd700]/20 text-[#ffd700] border border-[#ffd700]/40">
+              Veo 3
+            </span>
+          </button>
+
+          {/* 4. Client & Subscriber Portal */}
           <button
             id="nav-btn-client-portal"
             type="button"
@@ -420,6 +448,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>{isArabic ? 'سحابة Google Drive (حسابات متعددة)' : 'Google Drive (Multi-cloud)'}</span>
               </button>
             )}
+
+            {/* Mobile Creative Studio Button */}
+            <button
+              id="btn-mobile-creative-studio"
+              type="button"
+              onClick={() => {
+                if (onOpenCreativeStudio) {
+                  onOpenCreativeStudio();
+                } else {
+                  onToggleView('creative_studio');
+                }
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold bg-gradient-to-r from-[#d4af37]/25 via-[#ffd700]/30 to-[#c59b27]/25 text-[#ffd700] border border-[#d4af37]/50"
+            >
+              <Sparkles className="w-4 h-4 text-[#ffd700]" />
+              <span>{isArabic ? 'استوديو الذكاء الاصطناعي (Veo 3 & Gemini)' : 'AI Creative Studio (Veo 3)'}</span>
+            </button>
 
             {/* Mobile Keyboard Shortcuts Button */}
             {onOpenKeyboardShortcuts && (
