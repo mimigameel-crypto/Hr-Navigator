@@ -15,7 +15,9 @@ import {
   Youtube,
   Send,
   Copy,
-  Check
+  Check,
+  Keyboard,
+  Cloud
 } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../translations';
@@ -27,6 +29,8 @@ interface FooterProps {
   onOpenAuth: (mode: 'login' | 'register') => void;
   onRequestAdminAccess?: () => void;
   onOpenMagazine?: () => void;
+  onOpenKeyboardShortcuts?: () => void;
+  onOpenDrive?: () => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({
@@ -34,7 +38,9 @@ export const Footer: React.FC<FooterProps> = ({
   onExplore,
   onOpenAuth,
   onRequestAdminAccess,
-  onOpenMagazine
+  onOpenMagazine,
+  onOpenKeyboardShortcuts,
+  onOpenDrive
 }) => {
   const t = translations[lang];
   const isArabic = lang === 'ar';
@@ -312,7 +318,29 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom Rights Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div>{t.rightsReserved}</div>
+          <div className="flex items-center gap-3">
+            <span>{t.rightsReserved}</span>
+            {onOpenKeyboardShortcuts && (
+              <button
+                type="button"
+                onClick={onOpenKeyboardShortcuts}
+                className="hidden md:inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[#8a8d9a] hover:text-[#ffd700] border border-white/10 text-[11px] transition-colors cursor-pointer"
+              >
+                <Keyboard className="w-3 h-3 text-[#d4af37]" />
+                <span>{isArabic ? 'اختصارات المفاتيح (?)' : 'Shortcuts (?)'}</span>
+              </button>
+            )}
+            {onOpenDrive && (
+              <button
+                type="button"
+                onClick={onOpenDrive}
+                className="hidden md:inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#4285F4]/10 hover:bg-[#4285F4]/20 text-[#60a5fa] border border-[#4285F4]/30 text-[11px] transition-colors cursor-pointer"
+              >
+                <Cloud className="w-3 h-3 text-[#4285F4]" />
+                <span>{isArabic ? 'سحابة Drive' : 'Google Drive'}</span>
+              </button>
+            )}
+          </div>
 
           {/* Payment Gateways Bar */}
           <div className="flex items-center gap-2 flex-wrap justify-center text-[11px]">

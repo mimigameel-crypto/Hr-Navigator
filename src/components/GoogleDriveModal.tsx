@@ -10,14 +10,21 @@ import {
   ShieldCheck, 
   Sparkles,
   Download,
-  Trash2
+  Trash2,
+  Cloud,
+  Check,
+  ChevronDown
 } from 'lucide-react';
 import { Language } from '../types';
 import { 
   GoogleDriveFile, 
   getStoredDriveFiles, 
   saveFileToGoogleDrive,
-  GOOGLE_DRIVE_SCOPES 
+  GOOGLE_DRIVE_SCOPES,
+  GOOGLE_DRIVE_ACCOUNTS,
+  GoogleDriveAccount,
+  getActiveDriveAccountId,
+  setActiveDriveAccountId
 } from '../utils/googleDrive';
 
 interface GoogleDriveModalProps {
@@ -32,18 +39,27 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
   lang
 }) => {
   const isArabic = lang === 'ar';
+  const [selectedAccountId, setSelectedAccountId] = useState<string>(getActiveDriveAccountId());
   const [files, setFiles] = useState<GoogleDriveFile[]>([]);
   const [isConnected, setIsConnected] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
+  const activeAccount = GOOGLE_DRIVE_ACCOUNTS.find(a => a.id === selectedAccountId) || GOOGLE_DRIVE_ACCOUNTS[0];
+
   useEffect(() => {
     if (isOpen) {
-      setFiles(getStoredDriveFiles());
+      setFiles(getStoredDriveFiles(selectedAccountId));
     }
-  }, [isOpen]);
+  }, [isOpen, selectedAccountId]);
 
   if (!isOpen) return null;
+
+  const handleSwitchAccount = (accountId: string) => {
+    setSelectedAccountId(accountId);
+    setActiveDriveAccountId(accountId);
+    setFiles(getStoredDriveFiles(accountId));
+  };
 
   const handleSimulateUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,7 +67,7 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
 
     setIsUploading(true);
     try {
-      const newFile = await saveFileToGoogleDrive(file.name, 'toolkit');
+      const newFile = await saveFileToGoogleDrive(file.name, 'toolkit', activeAccount.email);
       setFiles(prev => [newFile, ...prev]);
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
@@ -100,17 +116,43 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
             </div>
           </div>
 
+          {/* Cloud Account Selector Tabs (Mimigameel & Mimigameel82) */}
+          <div className="mb-4 p-1.5 rounded-xl bg-[#141724] border border-white/10 flex items-center gap-1.5">
+            {GOOGLE_DRIVE_ACCOUNTS.map((acc) => {
+              const isSelected = acc.id === selectedAccountId;
+              return (
+                <button
+                  key={acc.id}
+                  type="button"
+                  onClick={() => handleSwitchAccount(acc.id)}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-[#4285F4]/30 to-[#3b82f6]/20 text-[#60a5fa] border border-[#4285F4]/60 shadow-sm'
+                      : 'text-[#8a8d9a] hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Cloud className={`w-3.5 h-3.5 ${acc.id.includes('secondary') ? 'text-amber-400' : 'text-[#4285F4]'}`} />
+                  <div className="text-start">
+                    <div className="leading-tight">{isArabic ? acc.nameAr : acc.nameEn}</div>
+                    <div className="text-[10px] font-mono text-[#8a8d9a] font-normal">{acc.email}</div>
+                  </div>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-emerald-400 ms-auto" />}
+                </button>
+              );
+            })}
+          </div>
+
           {/* Sync Status Banner */}
           <div className="p-4 rounded-xl bg-[#131726] border border-[#3b82f6]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-white mb-1">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{isArabic ? 'متصل بحساب Google Workspace' : 'Connected to Google Workspace'}</span>
+                <span>{isArabic ? `متصل بحساب: ${activeAccount.email}` : `Connected: ${activeAccount.email}`}</span>
               </div>
               <p className="text-[11px] text-[#9ea3b5]">
                 {isArabic 
-                  ? 'المجلد السحابي: My Drive / HR Navigator Consultations / Deliverables'
-                  : 'Cloud Folder: My Drive / HR Navigator Consultations / Deliverables'}
+                  ? `المجلد السحابي: ${activeAccount.cloudFolder}`
+                  : `Cloud Folder: ${activeAccount.cloudFolder}`}
               </p>
             </div>
 
@@ -148,9 +190,16 @@ export const GoogleDriveModal: React.FC<GoogleDriveModalProps> = ({
                     <FileText className="w-4 h-4" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-xs font-semibold text-white truncate">
-                      {f.name}
-                    </h4>
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="text-xs font-semibold text-white truncate">
+                        {f.name}
+                      </h4>
+                      {f.accountEmail && (
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-white/5 border border-white/10 text-[#8a8d9a]">
+                          {f.accountEmail.includes('82') ? 'Mimigameel82' : 'Mimigameel'}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-[10px] text-[#8a8d9a]">
                       {f.size} • {new Date(f.createdTime).toLocaleDateString(isArabic ? 'ar-EG' : 'en-US')}
                     </p>

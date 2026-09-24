@@ -59,7 +59,10 @@ import {
   GoogleDriveFile, 
   getStoredDriveFiles, 
   saveFileToGoogleDrive, 
-  GOOGLE_DRIVE_SCOPES 
+  GOOGLE_DRIVE_SCOPES,
+  GOOGLE_DRIVE_ACCOUNTS,
+  getActiveDriveAccountId,
+  setActiveDriveAccountId
 } from '../utils/googleDrive';
 
 interface AdminDashboardProps {
@@ -107,6 +110,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [copiedOwnerLink, setCopiedOwnerLink] = useState(false);
 
   // Google Drive Cloud Storage State
+  const [selectedDriveAccountId, setSelectedDriveAccountId] = useState<string>(getActiveDriveAccountId());
   const [driveFiles, setDriveFiles] = useState<GoogleDriveFile[]>([]);
   const [driveCategoryFilter, setDriveCategoryFilter] = useState<'all' | GoogleDriveFile['category']>('all');
   const [driveSearchTerm, setDriveSearchTerm] = useState('');
@@ -119,8 +123,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [driveUploadSuccess, setDriveUploadSuccess] = useState(false);
   const [copiedDriveId, setCopiedDriveId] = useState<string | null>(null);
 
+  const activeDriveAccount = GOOGLE_DRIVE_ACCOUNTS.find(a => a.id === selectedDriveAccountId) || GOOGLE_DRIVE_ACCOUNTS[0];
+
+  const handleSelectDriveAccount = (accId: string) => {
+    setSelectedDriveAccountId(accId);
+    setActiveDriveAccountId(accId);
+    setDriveFiles(getStoredDriveFiles(accId));
+  };
+
   useEffect(() => {
-    setDriveFiles(getStoredDriveFiles());
+    setDriveFiles(getStoredDriveFiles(selectedDriveAccountId));
 
     // Subscribe to cloud connection changes
     const unsub = CloudService.subscribe((conn) => {
@@ -128,27 +140,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setCloudConnectionsList(CloudService.getConnections());
     });
     return () => unsub();
-  }, []);
+  }, [selectedDriveAccountId]);
 
   const handleSyncAllInvoicesToDrive = async () => {
     setIsSyncingInvoices(true);
     try {
-      const currentStored = getStoredDriveFiles();
+      const currentStored = getStoredDriveFiles(selectedDriveAccountId);
       let newlySynced = 0;
       for (const order of orders) {
         const expectedName = `Invoice-${order.invoiceNumber}.pdf`;
         const alreadyExists = currentStored.some(f => f.name.toLowerCase() === expectedName.toLowerCase());
         if (!alreadyExists) {
-          await saveFileToGoogleDrive(expectedName, 'invoice');
+          await saveFileToGoogleDrive(expectedName, 'invoice', activeDriveAccount.email);
           newlySynced++;
         }
       }
-      const updated = getStoredDriveFiles();
+      const updated = getStoredDriveFiles(selectedDriveAccountId);
       setDriveFiles(updated);
       setSyncNotice(
         isArabic 
-          ? `تمت مزامنة ${newlySynced > 0 ? newlySynced : 'جميع'} فواتير الحجوزات بنجاح إلى مجلد Google Drive!`
-          : `Synced ${newlySynced > 0 ? newlySynced : 'all'} invoices successfully to Google Drive folder!`
+          ? `تمت مزامنة ${newlySynced > 0 ? newlySynced : 'جميع'} فواتير الحجوزات بنجاح إلى حساب Drive (${activeDriveAccount.email})!`
+          : `Synced ${newlySynced > 0 ? newlySynced : 'all'} invoices successfully to Drive account (${activeDriveAccount.email})!`
       );
       setTimeout(() => setSyncNotice(null), 4000);
     } catch (e) {
@@ -164,9 +176,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     setIsUploadingDrive(true);
     try {
       const cat = targetCategory || newDriveFileCategory;
-      await saveFileToGoogleDrive(file.name, cat);
-      setDriveFiles(getStoredDriveFiles());
-      setSyncNotice(isArabic ? `تم رفع ملف "${file.name}" إلى مجلد Google Drive بنجاح!` : `Uploaded "${file.name}" to Google Drive successfully!`);
+      await saveFileToGoogleDrive(file.name, cat, activeDriveAccount.email);
+      setDriveFiles(getStoredDriveFiles(selectedDriveAccountId));
+      setSyncNotice(isArabic ? `تم رفع ملف "${file.name}" إلى حساب Google Drive (${activeDriveAccount.email}) بنجاح!` : `Uploaded "${file.name}" to Google Drive (${activeDriveAccount.email}) successfully!`);
       setTimeout(() => setSyncNotice(null), 4000);
     } catch (err) {
       console.error(err);
@@ -180,8 +192,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     if (!newDriveFileName.trim()) return;
     setIsUploadingDrive(true);
     try {
-      await saveFileToGoogleDrive(newDriveFileName.trim(), newDriveFileCategory);
-      setDriveFiles(getStoredDriveFiles());
+      await saveFileToGoogleDrive(newDriveFileName.trim(), newDriveFileCategory, activeDriveAccount.email);
+      setDriveFiles(getStoredDriveFiles(selectedDriveAccountId));
       setDriveUploadSuccess(true);
       setTimeout(() => {
         setDriveUploadSuccess(false);
@@ -1132,9 +1144,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {isArabic ? 'سحابة ملفات Google Drive • بوابة الملاك' : 'Google Drive Cloud Storage • Owners Portal'}
                 </h3>
                 <p className="text-xs text-[#9ea3b5] mt-1 font-mono">
-                  {isArabic ? 'المجلد الرئيسي:' : 'Root Folder:'} <span className="text-[#ffd700]">My Drive / HR Navigator Consultations</span> • <span className="text-blue-300">hrnavigator.consult@gmail.com</span>
+                  {isArabic ? 'المجلد النشط:' : 'Active Folder:'} <span className="text-[#ffd700]">{activeDriveAccount.cloudFolder}</span> • <span className="text-blue-300">{activeDriveAccount.email}</span>
                 </p>
               </div>
+            </div>
+
+            {/* Account Switcher Bar (Mimigameel & Mimigameel82) */}
+            <div className="flex items-center gap-2 p-1.5 rounded-xl bg-black/40 border border-white/10">
+              <span className="text-[11px] text-[#8a8d9a] px-2 font-medium">
+                {isArabic ? 'حساب السحابة:' : 'Cloud Account:'}
+              </span>
+              {GOOGLE_DRIVE_ACCOUNTS.map((acc) => {
+                const isSelected = acc.id === selectedDriveAccountId;
+                return (
+                  <button
+                    key={acc.id}
+                    type="button"
+                    onClick={() => handleSelectDriveAccount(acc.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#4285F4] text-white shadow-md'
+                        : 'text-[#8a8d9a] hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Cloud className="w-3.5 h-3.5" />
+                    <span>{acc.email}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5" />}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
@@ -1482,8 +1520,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {isPdf ? <FileText className="w-4 h-4" /> : isXls ? <FileSpreadsheet className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
                           </div>
                           <div>
-                            <div className="font-bold text-white text-xs hover:text-[#60a5fa] transition-colors">
-                              {file.name}
+                            <div className="font-bold text-white text-xs hover:text-[#60a5fa] transition-colors flex items-center gap-1.5">
+                              <span>{file.name}</span>
+                              {file.accountEmail && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                                  {file.accountEmail.includes('82') ? 'Mimigameel82' : 'Mimigameel'}
+                                </span>
+                              )}
                             </div>
                             <div className="text-[10px] text-[#717688] font-mono mt-0.5">
                               ID: {file.id}

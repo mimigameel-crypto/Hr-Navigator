@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   MessageCircle, 
   X, 
@@ -35,6 +35,9 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [customMsg, setCustomMsg] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [typedGreeting, setTypedGreeting] = useState('');
+  const [typedSubtext, setTypedSubtext] = useState('');
   const isArabic = lang === 'ar';
 
   const phoneNumber = '201092792321';
@@ -82,6 +85,51 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
       currentTimeStr: timeString
     };
   }, [isArabic]);
+
+  // Typing animation effect whenever chat popup opens
+  useEffect(() => {
+    if (!isOpen) {
+      setTypedGreeting('');
+      setTypedSubtext('');
+      setIsTyping(false);
+      return;
+    }
+
+    setIsTyping(true);
+    setTypedGreeting('');
+    setTypedSubtext('');
+
+    let gIndex = 0;
+    let sIndex = 0;
+    let greetingTimer: any;
+    let subtextTimer: any;
+
+    // First type the greeting (e.g. "صباح الخير والبركة" or "Good morning!")
+    greetingTimer = setInterval(() => {
+      gIndex++;
+      setTypedGreeting(greeting.slice(0, gIndex));
+      if (gIndex >= greeting.length) {
+        clearInterval(greetingTimer);
+        // Slight pause, then stream the subtext
+        setTimeout(() => {
+          subtextTimer = setInterval(() => {
+            sIndex += 2; // smooth streaming
+            setTypedSubtext(subtext.slice(0, sIndex));
+            if (sIndex >= subtext.length) {
+              clearInterval(subtextTimer);
+              setTypedSubtext(subtext);
+              setIsTyping(false);
+            }
+          }, 24);
+        }, 150);
+      }
+    }, 45);
+
+    return () => {
+      clearInterval(greetingTimer);
+      clearInterval(subtextTimer);
+    };
+  }, [isOpen, greeting, subtext]);
 
   const defaultMessage = isArabic 
     ? `${greeting}، أود الاستفسار عن باقات استشارات HR Navigator وحجز جلسة لمؤسستنا.` 
@@ -204,15 +252,18 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
               </div>
             </div>
 
-            {/* Realistic Chat Bubble from Advisor with Dynamic Greeting */}
+            {/* Realistic Chat Bubble from Advisor with Dynamic Greeting and Typing Effect */}
             <div className="p-3.5 rounded-2xl rounded-tr-none rtl:rounded-tr-2xl rtl:rounded-tl-none bg-[#181b28] border border-white/10 text-[#e2e4ea] leading-relaxed shadow-sm">
               <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-white/5">
                 <p className="font-bold text-white flex items-center gap-1.5 text-xs">
                   <Sparkles className="w-3.5 h-3.5 text-[#ffd700]" />
-                  <span>{greeting}</span>
+                  <span>{typedGreeting || greeting}</span>
+                  {isTyping && !typedSubtext && (
+                    <span className="inline-block w-1.5 h-3 bg-[#ffd700] animate-pulse ml-1" />
+                  )}
                 </p>
                 <span className="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-medium">
-                  {isArabic ? 'استجابة سريعة' : 'Fast Response'}
+                  {isTyping ? (isArabic ? 'يكتب الآن...' : 'Typing...') : (isArabic ? 'استجابة سريعة' : 'Fast Response')}
                 </span>
               </div>
 
@@ -220,9 +271,16 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
                 {isArabic ? 'أهلاً بك في HR Navigator الاستشارية' : 'Welcome to HR Navigator Advisory'}
               </p>
 
-              <p className="text-[#a0a5b8] text-[11.5px] leading-relaxed">
-                {subtext}
-              </p>
+              <div className="text-[#a0a5b8] text-[11.5px] leading-relaxed min-h-[44px]">
+                {typedSubtext || (!isTyping ? subtext : '')}
+                {isTyping && typedSubtext && typedSubtext.length < subtext.length && (
+                  <span className="inline-flex items-center gap-0.5 ms-1.5 align-middle">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center justify-between text-[10px] text-[#6b7280] mt-2.5 pt-1.5 border-t border-white/5 font-mono">
                 <span className="flex items-center gap-1">
@@ -230,7 +288,7 @@ export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({ lang }) => {
                   <span>{currentTimeStr}</span>
                 </span>
                 <span className="text-emerald-400 font-sans">
-                  {isArabic ? 'مستشارنا متواجد الآن' : 'Advisor online now'}
+                  {isTyping ? (isArabic ? 'المستشار يكتب الرد...' : 'Advisor is typing...') : (isArabic ? 'مستشارنا متواجد الآن' : 'Advisor online now')}
                 </span>
               </div>
             </div>

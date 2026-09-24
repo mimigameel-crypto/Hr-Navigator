@@ -29,6 +29,7 @@ import { DigitalResourcesSection } from './components/DigitalResourcesSection';
 import { GoogleDriveModal } from './components/GoogleDriveModal';
 import { MagazinePageView } from './components/MagazinePageView';
 import { MagazineModal } from './components/MagazineModal';
+import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { DigitalResource, SocialPost } from './types';
 import { initialDigitalResources, initialSocialPosts } from './data/resourcesData';
 import { CloudService } from './lib/cloudService';
@@ -192,6 +193,110 @@ export default function App() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [googleDriveModalOpen, setGoogleDriveModalOpen] = useState(false);
   const [magazineModalOpen, setMagazineModalOpen] = useState(false);
+  const [keyboardShortcutsModalOpen, setKeyboardShortcutsModalOpen] = useState(false);
+
+  // Global Keyboard Shortcuts (Press ? for help, M for Magazine, D for Drive, P for Portal, H for Store, C for Cart, Q for Quick Checkout, L for Language, T for Top)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if user is currently typing in an input, textarea or contenteditable element
+      const target = e.target as HTMLElement | null;
+      if (target) {
+        const tagName = target.tagName?.toLowerCase();
+        if (tagName === 'input' || tagName === 'textarea' || tagName === 'select' || target.isContentEditable) {
+          if (e.key === 'Escape') {
+            (target as HTMLElement).blur();
+          }
+          return;
+        }
+      }
+
+      // Escape closes open modals
+      if (e.key === 'Escape') {
+        setKeyboardShortcutsModalOpen(false);
+        setGoogleDriveModalOpen(false);
+        setMagazineModalOpen(false);
+        setShareModalOpen(false);
+        setCartDrawerOpen(false);
+        setAuthModalOpen(false);
+        setCheckoutModalOpen(false);
+        setInvoiceModalOpen(false);
+        setContractModalOpen(false);
+        setAdminSecurityModalOpen(false);
+        return;
+      }
+
+      // Help: ? or /
+      if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+        e.preventDefault();
+        setKeyboardShortcutsModalOpen(prev => !prev);
+        return;
+      }
+
+      // Normalize key
+      const key = e.key.toLowerCase();
+
+      // Magazine: 'm' or 'ة' (Arabic layout)
+      if (key === 'm' || key === 'ة') {
+        e.preventDefault();
+        navigateToMagazine(setActiveView);
+        return;
+      }
+
+      // Google Drive: 'd' or 'ي' (Arabic layout)
+      if (key === 'd' || key === 'ي') {
+        e.preventDefault();
+        setGoogleDriveModalOpen(true);
+        return;
+      }
+
+      // Client Portal: 'p' or 'ح' (Arabic layout)
+      if (key === 'p' || key === 'ح') {
+        e.preventDefault();
+        setActiveView('client_portal');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Home / Store: 'h' or 'ا' (Arabic layout)
+      if (key === 'h' || key === 'ا') {
+        e.preventDefault();
+        setActiveView('store');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Cart Drawer: 'c' or 'ؤ' (Arabic layout)
+      if (key === 'c' || key === 'ؤ') {
+        e.preventDefault();
+        setCartDrawerOpen(prev => !prev);
+        return;
+      }
+
+      // Quick Pay Checkout: 'q' or 'ض' (Arabic layout)
+      if (key === 'q' || key === 'ض') {
+        e.preventDefault();
+        handleQuickCheckout();
+        return;
+      }
+
+      // Toggle Language: 'l' or 'م' (Arabic layout)
+      if (key === 'l' || key === 'م') {
+        e.preventDefault();
+        toggleLanguage();
+        return;
+      }
+
+      // Scroll to Top: 't' or 'ف' (Arabic layout)
+      if (key === 't' || key === 'ف') {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [cart, services]);
 
   // Sync HTML tag direction & lang
   useEffect(() => {
@@ -427,6 +532,8 @@ export default function App() {
         onOpenShare={() => setShareModalOpen(true)}
         onNavigateResources={scrollToResources}
         onOpenMagazineModal={() => navigateToMagazine(setActiveView)}
+        onOpenDrive={() => setGoogleDriveModalOpen(true)}
+        onOpenKeyboardShortcuts={() => setKeyboardShortcutsModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -556,6 +663,8 @@ export default function App() {
         }}
         onRequestAdminAccess={() => setAdminSecurityModalOpen(true)}
         onOpenMagazine={() => navigateToMagazine(setActiveView)}
+        onOpenKeyboardShortcuts={() => setKeyboardShortcutsModalOpen(true)}
+        onOpenDrive={() => setGoogleDriveModalOpen(true)}
       />
 
       {/* Owner Security PIN Modal */}
@@ -655,6 +764,13 @@ export default function App() {
           setActiveView('store');
           scrollToCatalog();
         }}
+      />
+
+      {/* Keyboard Shortcuts Guide Modal */}
+      <KeyboardShortcutsModal
+        isOpen={keyboardShortcutsModalOpen}
+        onClose={() => setKeyboardShortcutsModalOpen(false)}
+        lang={lang}
       />
 
       {/* Floating WhatsApp Contact Button for Instant Customer Service (hidden during checkout) */}

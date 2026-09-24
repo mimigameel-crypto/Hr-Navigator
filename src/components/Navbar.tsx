@@ -15,7 +15,9 @@ import {
   Share2,
   FileText,
   HardDrive,
-  BookOpen
+  BookOpen,
+  Keyboard,
+  Cloud
 } from 'lucide-react';
 import { Language, User, Currency, ActiveView } from '../types';
 import { translations } from '../translations';
@@ -41,6 +43,8 @@ interface NavbarProps {
   onOpenShare: () => void;
   onNavigateResources?: () => void;
   onOpenMagazineModal?: () => void;
+  onOpenDrive?: () => void;
+  onOpenKeyboardShortcuts?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -60,7 +64,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   isAdminAuthenticated,
   onOpenShare,
   onNavigateResources,
-  onOpenMagazineModal
+  onOpenMagazineModal,
+  onOpenDrive,
+  onOpenKeyboardShortcuts
 }) => {
   const t = translations[lang];
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -239,6 +245,34 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           )}
 
+          {/* Google Drive Dual Cloud Button */}
+          {onOpenDrive && (
+            <button
+              id="btn-navbar-drive"
+              type="button"
+              onClick={onOpenDrive}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#4285F4]/40 bg-[#4285F4]/10 hover:bg-[#4285F4]/20 text-[#60a5fa] hover:text-white text-xs font-bold transition-all cursor-pointer shadow-sm"
+              title={isArabic ? 'سحابة Google Drive (الحسابات المتعددة)' : 'Google Drive (Multi-cloud Accounts)'}
+            >
+              <Cloud className="w-3.5 h-3.5 text-[#4285F4]" />
+              <span className="hidden lg:inline">{isArabic ? 'سحابة Drive' : 'Drive'}</span>
+            </button>
+          )}
+
+          {/* Keyboard Shortcuts Trigger Button */}
+          {onOpenKeyboardShortcuts && (
+            <button
+              id="btn-navbar-shortcuts"
+              type="button"
+              onClick={onOpenKeyboardShortcuts}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg border border-white/10 bg-[#161824] hover:bg-[#202334] text-[#9ea3b5] hover:text-[#ffd700] text-xs transition-all cursor-pointer shadow-sm"
+              title={isArabic ? 'اختصارات لوحة المفاتيح (?)' : 'Keyboard Shortcuts (?)'}
+            >
+              <Keyboard className="w-3.5 h-3.5 text-[#d4af37]" />
+              <span className="text-[10px] font-mono text-[#ffd700] bg-white/5 px-1 py-0.2 rounded border border-white/10 hidden xl:inline">?</span>
+            </button>
+          )}
+
           {/* Share Client Link Button */}
           <button
             id="btn-navbar-share"
@@ -370,6 +404,38 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Share2 className="w-4 h-4 text-blue-400" />
               <span>{isArabic ? 'مشاركة ونشر رابط المشتركين' : 'Share Subscriber Link'}</span>
             </button>
+
+            {/* Mobile Google Drive Button */}
+            {onOpenDrive && (
+              <button
+                id="btn-mobile-drive"
+                type="button"
+                onClick={() => {
+                  onOpenDrive();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold bg-[#4285F4]/15 text-[#60a5fa] border border-[#4285F4]/40"
+              >
+                <Cloud className="w-4 h-4 text-[#4285F4]" />
+                <span>{isArabic ? 'سحابة Google Drive (حسابات متعددة)' : 'Google Drive (Multi-cloud)'}</span>
+              </button>
+            )}
+
+            {/* Mobile Keyboard Shortcuts Button */}
+            {onOpenKeyboardShortcuts && (
+              <button
+                id="btn-mobile-shortcuts"
+                type="button"
+                onClick={() => {
+                  onOpenKeyboardShortcuts();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-medium text-[#8a8d9a] hover:text-[#ffd700] border border-white/5"
+              >
+                <Keyboard className="w-4 h-4 text-[#d4af37]" />
+                <span>{isArabic ? 'اختصارات لوحة المفاتيح' : 'Keyboard Shortcuts'}</span>
+              </button>
+            )}
 
             {isAdminAuthenticated ? (
               <button
