@@ -21,6 +21,7 @@ import { Language, User, Currency, ActiveView } from '../types';
 import { translations } from '../translations';
 import { BrandLogo } from './BrandLogo';
 import { CurrencySelector } from './CurrencySelector';
+import { navigateToMagazine } from '../utils/navigation';
 
 interface NavbarProps {
   lang: Language;
@@ -103,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               if (onOpenMagazineModal) {
                 onOpenMagazineModal();
               } else {
-                onToggleView('magazine');
+                navigateToMagazine(onToggleView, () => setMobileMenuOpen(false));
               }
             }}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
@@ -336,11 +337,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               type="button"
               onClick={() => {
-                setMobileMenuOpen(false);
                 if (onOpenMagazineModal) {
+                  setMobileMenuOpen(false);
                   onOpenMagazineModal();
                 } else {
-                  onToggleView('magazine');
+                  navigateToMagazine(onToggleView, () => setMobileMenuOpen(false));
                 }
               }}
               className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold border transition-colors ${

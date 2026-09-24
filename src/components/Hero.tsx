@@ -17,6 +17,8 @@ import {
 import { Language } from '../types';
 import { translations } from '../translations';
 import { BrandLogo } from './BrandLogo';
+import { navigateToMagazine } from '../utils/navigation';
+import { ActiveView } from '../types';
 
 interface HeroProps {
   lang: Language;
@@ -25,6 +27,7 @@ interface HeroProps {
   onQuickPay: () => void;
   onShare: () => void;
   onOpenMagazine?: () => void;
+  setActiveView?: (view: ActiveView) => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
@@ -33,11 +36,20 @@ export const Hero: React.FC<HeroProps> = ({
   onJoin,
   onQuickPay,
   onShare,
-  onOpenMagazine
+  onOpenMagazine,
+  setActiveView
 }) => {
   const t = translations[lang];
   const isArabic = lang === 'ar';
   const ArrowIcon = isArabic ? ArrowLeft : ArrowRight;
+
+  const handleMagazineClick = () => {
+    if (setActiveView) {
+      navigateToMagazine(setActiveView);
+    } else if (onOpenMagazine) {
+      onOpenMagazine();
+    }
+  };
 
   return (
     <section id="hero-section" className="relative overflow-hidden pt-10 pb-20 lg:pt-16 lg:pb-28">
@@ -177,11 +189,11 @@ export const Hero: React.FC<HeroProps> = ({
               <span>{t.joinNow}</span>
             </button>
 
-            {onOpenMagazine && (
+            {(onOpenMagazine || setActiveView) && (
               <button
                 id="hero-btn-magazine-full"
                 type="button"
-                onClick={onOpenMagazine}
+                onClick={handleMagazineClick}
                 className="w-full sm:w-auto px-6 py-4 rounded-xl border border-[#d4af37]/60 bg-gradient-to-r from-[#d4af37]/15 to-[#ffd700]/10 hover:from-[#d4af37]/25 hover:to-[#ffd700]/20 text-[#ffd700] font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_2px_15px_rgba(212,175,55,0.2)] cursor-pointer"
               >
                 <BookOpen className="w-4 h-4 text-[#d4af37]" />

@@ -32,6 +32,7 @@ import { MagazineModal } from './components/MagazineModal';
 import { DigitalResource, SocialPost } from './types';
 import { initialDigitalResources, initialSocialPosts } from './data/resourcesData';
 import { CloudService } from './lib/cloudService';
+import { navigateToMagazine } from './utils/navigation';
 
 export default function App() {
   // Language state (persisted)
@@ -425,10 +426,7 @@ export default function App() {
         isAdminAuthenticated={isAdminUnlocked || currentUser?.role === 'admin'}
         onOpenShare={() => setShareModalOpen(true)}
         onNavigateResources={scrollToResources}
-        onOpenMagazineModal={() => {
-          setActiveView('magazine');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenMagazineModal={() => navigateToMagazine(setActiveView)}
       />
 
       {/* Main Content Area */}
@@ -445,10 +443,8 @@ export default function App() {
               }}
               onQuickPay={handleQuickCheckout}
               onShare={() => setShareModalOpen(true)}
-              onOpenMagazine={() => {
-                setActiveView('magazine');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onOpenMagazine={() => navigateToMagazine(setActiveView)}
+              setActiveView={setActiveView}
             />
 
             {/* 6 Specialization Pillars Strip */}
@@ -480,10 +476,7 @@ export default function App() {
               onBuyResource={handleBuyResource}
               resources={digitalResources}
               socialPosts={socialPosts}
-              onOpenMagazinePage={() => {
-                setActiveView('magazine');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
+              onOpenMagazinePage={() => navigateToMagazine(setActiveView)}
             />
           </>
         ) : activeView === 'magazine' ? (
@@ -562,10 +555,7 @@ export default function App() {
           setAuthModalOpen(true);
         }}
         onRequestAdminAccess={() => setAdminSecurityModalOpen(true)}
-        onOpenMagazine={() => {
-          setActiveView('magazine');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenMagazine={() => navigateToMagazine(setActiveView)}
       />
 
       {/* Owner Security PIN Modal */}
@@ -660,10 +650,7 @@ export default function App() {
         isOpen={magazineModalOpen}
         onClose={() => setMagazineModalOpen(false)}
         lang={lang}
-        onOpenFullPageView={() => {
-          setActiveView('magazine');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onOpenFullPageView={() => navigateToMagazine(setActiveView)}
         onConsultationBook={() => {
           setActiveView('store');
           scrollToCatalog();
